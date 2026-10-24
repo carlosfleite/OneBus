@@ -18,6 +18,9 @@ class PassStore extends ValueNotifier<double> {
 
   static const fare = 5.0;
 
+  /// Service fee charged on top of every recharge.
+  static const rechargeFee = 1.50;
+
   /// Below this the pass is "running out": fewer than two trips left.
   static const lowThreshold = 2 * fare;
 

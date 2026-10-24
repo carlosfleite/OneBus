@@ -12,6 +12,7 @@ import '../services/favorites_store.dart';
 import '../services/nearby.dart';
 import '../widgets/glass.dart';
 import '../widgets/ios.dart';
+import '../widgets/ad_banner.dart';
 import '../widgets/live_mini_map.dart';
 import '../widgets/pass_alert.dart';
 import '../widgets/recharge_widgets.dart';
@@ -272,6 +273,8 @@ class _HomeCard extends StatelessWidget {
                   style: text.bodySmall?.copyWith(color: ios.secondaryLabel),
                 ),
               ),
+            const SizedBox(height: 16),
+            const AdBanner(),
             const SectionHeader('Perto de você'),
             NearestStopCard(
               onOpen: () => nav.openOnMap(StopPage(nearest.stop.id)),

@@ -7,6 +7,7 @@ import '../services/alerts_center.dart';
 import '../services/auth_store.dart';
 import '../services/nearby.dart';
 import '../services/pass_store.dart';
+import '../widgets/ad_banner.dart';
 import '../widgets/ios.dart';
 import '../widgets/onebus_logo.dart';
 import '../widgets/pass_alert.dart';
@@ -59,7 +60,10 @@ class PassScreen extends StatelessWidget {
                 ),
                 InsetGroup(
                   separatorIndent: 58,
-                  footer: 'Também dá para recarregar pelo app, acima.',
+                  footer:
+                      'A recarga pelo app tem taxa de serviço de '
+                      '${formatMoney(PassStore.rechargeFee)}. Nos pontos de recarga, '
+                      'consulte o atendente.',
                   children: [
                     for (final n in nearby)
                       RechargeRow(
@@ -68,6 +72,8 @@ class PassScreen extends StatelessWidget {
                       ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                const AdBanner(),
                 const SectionHeader('Últimas viagens'),
                 InsetGroup(
                   separatorIndent: 74,
@@ -111,6 +117,10 @@ class PassScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => CupertinoActionSheet(
         title: const Text('Valor da recarga'),
+        message: const Text(
+          'Para facilitar sua vida e manter o app rodando liso, incluímos '
+          'apenas uma taxinha de serviço na sua recarga :)',
+        ),
         actions: [
           for (final v in const [10.0, 20.0, 50.0])
             CupertinoActionSheetAction(
@@ -122,11 +132,16 @@ class PassScreen extends StatelessWidget {
                     icon: CupertinoIcons.creditcard_fill,
                     color: AppColors.brandInk,
                     title: 'Recarga confirmada',
-                    message: '${formatMoney(v)} adicionados ao seu passe.',
+                    message:
+                        '${formatMoney(v)} adicionados ao seu passe. '
+                        'Total cobrado: ${formatMoney(v + PassStore.rechargeFee)} '
+                        '(taxa de serviço ${formatMoney(PassStore.rechargeFee)}).',
                   ),
                 );
               },
-              child: Text(formatMoney(v)),
+              child: Text(
+                '${formatMoney(v)}  ·  paga ${formatMoney(v + PassStore.rechargeFee)}',
+              ),
             ),
         ],
         cancelButton: CupertinoActionSheetAction(
