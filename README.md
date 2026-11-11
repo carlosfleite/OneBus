@@ -86,7 +86,7 @@ Pesquisamos o que os usuários criticam em Moovit, Cittamobi, Transit e similare
 | Acessibilidade | Selo de **ônibus acessível** e de **ar-condicionado**. |
 | Mudanças de itinerário sem aviso | **Avisos de serviço** (desvios e obras) na home, na linha e nos pontos afetados. |
 | Perder o ônibus ou o ponto de descida | **Alerta de chegada** (sino: avisa quando faltam 3 min) e **aviso de descida** (avisa 1 min antes do seu ponto). |
-| Excesso de anúncios | Sem anúncios. |
+| Excesso de anúncios | Anúncios discretos, só nas abas Início e Passe (nunca no mapa). A proposta de negócio prevê uma assinatura sem anúncios (OneBus Plus). |
 
 ## Mapa ao vivo
 
