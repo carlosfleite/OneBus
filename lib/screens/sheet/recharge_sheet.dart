@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 
+import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/nearby.dart';
 import '../../widgets/ios.dart';
@@ -39,7 +39,7 @@ SheetContent buildRechargeSheet(
 ) {
   final near = rechargeDistanceTo(pointId);
   final p = near.point;
-  final ios = IosColors.of(context);
+  final ios = AppPalette.of(context);
   final open = p.isOpenAt(DateTime.now());
 
   return SheetContent(
@@ -57,12 +57,12 @@ SheetContent buildRechargeSheet(
         runSpacing: 8,
         children: [
           InfoPill(
-            icon: CupertinoIcons.clock,
+            icon: Icons.schedule_rounded,
             label: rechargeStatus(p),
             color: open ? AppColors.green : AppColors.red,
           ),
           InfoPill(
-            icon: CupertinoIcons.location,
+            icon: Icons.near_me_outlined,
             label: '${near.distanceLabel} · ${near.walkLabel}',
           ),
         ],
@@ -72,20 +72,20 @@ SheetContent buildRechargeSheet(
         children: [
           IosRow(
             leading: const IconTile(
-              CupertinoIcons.placemark_fill,
+              Icons.location_on_rounded,
               AppColors.gray,
             ),
             title: 'Endereço',
             subtitle: p.address,
           ),
           IosRow(
-            leading: const IconTile(CupertinoIcons.clock_fill, AppColors.gray),
+            leading: const IconTile(Icons.schedule_rounded, AppColors.gray),
             title: 'Horário',
             subtitle: p.hoursLabel,
           ),
           IosRow(
             leading: const IconTile(
-              CupertinoIcons.creditcard_fill,
+              Icons.credit_card_rounded,
               AppColors.brandInk,
             ),
             title: 'Leve seu passe',

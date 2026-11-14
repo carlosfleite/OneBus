@@ -1,10 +1,13 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:onebus/features/tour/tour_controller.dart';
 import 'package:onebus/main.dart';
+import 'package:onebus/services/feed_service.dart';
 import 'package:onebus/services/auth_store.dart';
 import 'package:onebus/services/favorites_store.dart';
+import 'package:onebus/widgets/ds/app_search_field.dart';
 
 Future<void> _openApp(WidgetTester tester) async {
   tester.view.physicalSize = const Size(390 * 3, 844 * 3);
@@ -13,6 +16,8 @@ Future<void> _openApp(WidgetTester tester) async {
   // Arrival notifications are covered in alerts_test; keep banners (and
   // their dismiss timers) out of the UI tests.
   FavoritesStore.instance.notifyArrivals = false;
+  TourController.instance.skipForTests();
+  FeedService.loadingDelay = Duration.zero;
   SharedPreferences.setMockInitialValues({});
   await AuthStore.instance.createAccount(
     name: 'Duda',
@@ -62,7 +67,7 @@ void main() {
   testWidgets('line and bus pages render on the map tab', (tester) async {
     await _openApp(tester);
     await _tab(tester, 'map');
-    await tester.enterText(find.byType(CupertinoSearchTextField), '214');
+    await tester.enterText(find.byType(AppSearchField), '214');
     await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.text('Centro ↔ Unesp').last);
     await tester.pump(const Duration(milliseconds: 500));

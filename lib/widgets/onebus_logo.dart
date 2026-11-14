@@ -143,7 +143,7 @@ class OneBusWordmark extends StatelessWidget {
           ),
         ],
       ),
-      style: GoogleFonts.inter(
+      style: GoogleFonts.plusJakartaSans(
         fontSize: fontSize,
         fontWeight: FontWeight.w800,
         letterSpacing: -fontSize * 0.045,

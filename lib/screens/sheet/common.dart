@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../data/mock_data.dart';
 import '../../services/alerts_center.dart';
+import '../../widgets/ds/app_sheets.dart';
 import '../../widgets/ios.dart';
 
 const sheetPadding = EdgeInsets.symmetric(horizontal: 16);
@@ -29,7 +29,7 @@ class SheetTitleHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
@@ -77,7 +77,7 @@ class FavoriteCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -85,7 +85,7 @@ class FavoriteCircle extends StatelessWidget {
         height: 30,
         decoration: BoxDecoration(color: ios.fill, shape: BoxShape.circle),
         child: Icon(
-          active ? CupertinoIcons.star_fill : CupertinoIcons.star,
+          active ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 15,
           color: active ? AppColors.orange : ios.secondaryLabel,
         ),
@@ -103,7 +103,7 @@ class ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return Row(
       children: [
         for (var i = 0; i < actions.length; i++) ...[
@@ -114,7 +114,7 @@ class ActionButtons extends StatelessWidget {
               child: Container(
                 height: 58,
                 decoration: BoxDecoration(
-                  color: actions[i].primary ? ios.tint : ios.cell,
+                  color: actions[i].primary ? ios.accent : ios.cell,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -123,7 +123,7 @@ class ActionButtons extends StatelessWidget {
                     Icon(
                       actions[i].icon,
                       size: 20,
-                      color: actions[i].primary ? Colors.white : ios.tint,
+                      color: actions[i].primary ? ios.onAccent : ios.label,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -131,7 +131,7 @@ class ActionButtons extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: actions[i].primary ? Colors.white : ios.tint,
+                        color: actions[i].primary ? ios.onAccent : ios.label,
                       ),
                     ),
                   ],
@@ -161,7 +161,7 @@ class ServiceAlertCard extends StatelessWidget {
         children: [
           IosRow(
             leading: const IconTile(
-              CupertinoIcons.exclamationmark_triangle_fill,
+              Icons.warning_amber_rounded,
               AppColors.orange,
             ),
             title: 'Aviso · Linha ${line.number}',
@@ -185,28 +185,13 @@ void showReportSheet(BuildContext context, String lineId) {
     'Direção perigosa',
     'Ônibus sujo',
   ];
-  showCupertinoModalPopup<void>(
-    context: context,
-    builder: (ctx) => CupertinoActionSheet(
-      title: Text('Reportar problema · Linha ${MockData.line(lineId).number}'),
-      message: const Text(
-        'Seu relato vai para a operadora e ajuda outros passageiros.',
-      ),
-      actions: [
-        for (final p in problems)
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.pop(ctx);
-              AlertsCenter.instance.reportProblem(lineId, p);
-            },
-            child: Text(p),
-          ),
-      ],
-      cancelButton: CupertinoActionSheetAction(
-        isDefaultAction: true,
-        onPressed: () => Navigator.pop(ctx),
-        child: const Text('Cancelar'),
-      ),
-    ),
+  showActionSheet(
+    context,
+    title: 'Reportar problema · Linha ${MockData.line(lineId).number}',
+    message: 'Seu relato vai para a operadora e ajuda outros passageiros.',
+    actions: [
+      for (final p in problems)
+        SheetAction(p, () => AlertsCenter.instance.reportProblem(lineId, p)),
+    ],
   );
 }

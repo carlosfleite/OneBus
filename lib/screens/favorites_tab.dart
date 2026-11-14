@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
@@ -8,6 +7,9 @@ import '../services/bus_simulator.dart';
 import '../services/favorites_store.dart';
 import '../services/nearby.dart';
 import '../services/notification_service.dart';
+import '../widgets/ds/app_segmented.dart';
+import '../widgets/ds/empty_state.dart';
+import '../widgets/favorite_actions.dart';
 import '../widgets/ios.dart';
 import '../widgets/tab_page.dart';
 import 'app_shell.dart';
@@ -31,7 +33,7 @@ class FavoritesTab extends StatelessWidget {
       builder: (context, _) {
         final sim = BusSimulator.instance;
         final favs = FavoritesStore.instance;
-        final ios = IosColors.of(context);
+        final ios = AppPalette.of(context);
         final pairs = favs.watchedPairs;
 
         return TabPage(
@@ -46,40 +48,32 @@ class FavoritesTab extends StatelessWidget {
               children: [
                 IosRow(
                   leading: const IconTile(
-                    CupertinoIcons.bell_fill,
+                    Icons.notifications_rounded,
                     AppColors.red,
                   ),
                   title: 'Avisar quando estiver chegando',
-                  trailing: CupertinoSwitch(
+                  trailing: Switch(
                     value: favs.notifyArrivals,
-                    activeTrackColor: ios.live,
                     onChanged: favs.setNotifyArrivals,
                   ),
                 ),
                 if (favs.notifyArrivals)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(58, 10, 16, 10),
-                    child: Row(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            'Antecedência',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
+                        Text(
+                          'Avisar com antecedência de',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        CupertinoSlidingSegmentedControl<int>(
-                          groupValue: favs.notifyMinutes,
-                          onValueChanged: (v) {
-                            if (v != null) favs.setNotifyMinutes(v);
-                          },
-                          children: {
+                        const SizedBox(height: 10),
+                        AppSegmented<int>(
+                          value: favs.notifyMinutes,
+                          onChanged: favs.setNotifyMinutes,
+                          options: {
                             for (final m in FavoritesStore.minuteOptions)
-                              m: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                ),
-                                child: Text('$m min'),
-                              ),
+                              m: '$m min',
                           },
                         ),
                       ],
@@ -88,14 +82,14 @@ class FavoritesTab extends StatelessWidget {
                 _PermissionRow(service: notifications),
                 IosRow(
                   leading: const IconTile(
-                    CupertinoIcons.paperplane_fill,
+                    Icons.send_rounded,
                     AppColors.blue,
                   ),
                   title: 'Enviar notificação de teste',
                   titleColor: ios.tint,
                   onTap: () => AlertsCenter.instance.show(
                     const AppBanner(
-                      icon: CupertinoIcons.star_fill,
+                      icon: Icons.star_rounded,
                       color: AppColors.lineBlue,
                       title: 'Linha 214 chegando no seu ponto',
                       message: 'Teste: chega em 3 min em Rua Aimorés.',
@@ -110,13 +104,12 @@ class FavoritesTab extends StatelessWidget {
               separatorIndent: 74,
               children: [
                 if (pairs.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'Nenhuma combinação ainda. Favorite um ponto por onde '
-                      'passa uma das suas linhas favoritas.',
-                      style: TextStyle(color: ios.secondaryLabel),
-                    ),
+                  const EmptyState(
+                    icon: Icons.notifications_none_rounded,
+                    title: 'Nada sendo monitorado',
+                    message:
+                        'Favorite uma linha e um ponto por onde ela passa '
+                        'para ser avisado quando o ônibus estiver chegando.',
                   ),
                 for (final p in pairs)
                   IosRow(
@@ -145,7 +138,7 @@ class FavoritesTab extends StatelessWidget {
                     subtitle: 'A cada ~${line.headwayMinutes} min',
                     trailing: _Star(
                       active: favs.hasLine(line.id),
-                      onTap: () => favs.toggleLine(line.id),
+                      onTap: () => toggleLineFavorite(context, line.id),
                     ),
                     onTap: () => nav.openOnMap(LinePage(line.id)),
                   ),
@@ -157,20 +150,20 @@ class FavoritesTab extends StatelessWidget {
               children: [
                 for (final stopId in favs.stops)
                   IosRow(
-                    leading: const IconTile(CupertinoIcons.bus, AppColors.gray),
+                    leading: const IconTile(Icons.directions_bus_rounded, AppColors.gray),
                     title: MockData.stop(stopId).name,
                     subtitle:
                         '${distanceTo(stopId).distanceLabel} · linhas '
                         '${MockData.stop(stopId).lineIds.map((l) => MockData.line(l).number).join(', ')}',
                     trailing: _Star(
                       active: true,
-                      onTap: () => favs.toggleStop(stopId),
+                      onTap: () => toggleStopFavorite(context, stopId),
                     ),
                     onTap: () => nav.openOnMap(StopPage(stopId)),
                   ),
                 IosRow(
                   leading: Icon(
-                    CupertinoIcons.add_circled_solid,
+                    Icons.add_circle_rounded,
                     color: ios.tint,
                     size: 30,
                   ),
@@ -194,7 +187,7 @@ class _PermissionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final (subtitle, canAsk) = switch (service.permission.value) {
       NotificationPermission.granted => ('Permitidas', false),
       NotificationPermission.denied => (
@@ -212,23 +205,20 @@ class _PermissionRow extends StatelessWidget {
       ),
     };
     return IosRow(
-      leading: const IconTile(CupertinoIcons.app_badge_fill, AppColors.orange),
+      leading: const IconTile(Icons.notifications_active_rounded, AppColors.orange),
       title: 'Notificações do sistema',
       subtitle: subtitle,
       trailing: canAsk
-          ? CupertinoButton(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              minimumSize: const Size(0, 30),
-              color: ios.tint,
-              borderRadius: BorderRadius.circular(15),
-              onPressed: service.requestPermission,
-              child: const Text(
-                'Permitir',
-                style: TextStyle(color: Colors.white, fontSize: 15),
+          ? FilledButton(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 44),
+                padding: const EdgeInsets.symmetric(horizontal: 18),
               ),
+              onPressed: service.requestPermission,
+              child: const Text('Permitir'),
             )
           : service.permission.value == NotificationPermission.granted
-          ? Icon(CupertinoIcons.checkmark_alt, color: ios.live)
+          ? Icon(Icons.check_rounded, color: ios.live)
           : null,
     );
   }
@@ -247,11 +237,11 @@ class _Star extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Icon(
-          active ? CupertinoIcons.star_fill : CupertinoIcons.star,
+          active ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 22,
           color: active
               ? AppColors.orange
-              : IosColors.of(context).tertiaryLabel,
+              : AppPalette.of(context).tertiaryLabel,
         ),
       ),
     );

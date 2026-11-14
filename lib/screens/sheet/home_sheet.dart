@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth_store.dart';
@@ -8,6 +7,8 @@ import '../../data/mock_data.dart';
 import '../../services/bus_simulator.dart';
 import '../../services/favorites_store.dart';
 import '../../services/nearby.dart';
+import '../../widgets/ds/app_search_field.dart';
+import '../../widgets/favorite_actions.dart';
 import '../../widgets/ios.dart';
 import '../../widgets/recharge_widgets.dart';
 import '../../widgets/stop_widgets.dart';
@@ -17,7 +18,7 @@ import 'sheet_nav.dart';
 SheetContent buildHomeSheet(BuildContext context, SheetNav nav) {
   final query = nav.search.text.trim().toLowerCase();
   return SheetContent(
-    headerHeight: 60,
+    headerHeight: 68,
     header: _SearchHeader(nav: nav),
     body: query.isEmpty
         ? _homeBody(context, nav)
@@ -32,23 +33,15 @@ class _SearchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Row(
         children: [
           Expanded(
-            child: CupertinoSearchTextField(
+            child: AppSearchField(
               controller: nav.search,
               focusNode: nav.searchFocus,
               placeholder: 'Buscar linhas e pontos',
-              backgroundColor: ios.fill,
-              style: Theme.of(context).textTheme.bodyLarge,
-              placeholderStyle: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: ios.secondaryLabel),
-              itemColor: ios.secondaryLabel,
-              borderRadius: BorderRadius.circular(10),
             ),
           ),
           const SizedBox(width: 12),
@@ -112,7 +105,7 @@ List<Widget> _homeBody(BuildContext context, SheetNav nav) {
         for (final n in rechargeByDistance().take(2))
           RechargeRow(near: n, onTap: () => nav.push(RechargePage(n.point.id))),
         IosRow(
-          leading: const IconTile(CupertinoIcons.map_fill, AppColors.gray),
+          leading: const IconTile(Icons.map_rounded, AppColors.gray),
           title: 'Ver todos os pontos de recarga',
           chevron: true,
           onTap: () => nav.push(const RechargeListPage()),
@@ -139,7 +132,7 @@ List<Widget> _homeBody(BuildContext context, SheetNav nav) {
 }
 
 List<Widget> _searchResults(BuildContext context, SheetNav nav, String q) {
-  final ios = IosColors.of(context);
+  final ios = AppPalette.of(context);
   final lines = MockData.lines.where(
     (l) => l.number.contains(q) || l.name.toLowerCase().contains(q),
   );
@@ -150,7 +143,7 @@ List<Widget> _searchResults(BuildContext context, SheetNav nav, String q) {
   if (lines.isEmpty && stops.isEmpty) {
     return [
       const SizedBox(height: 40),
-      Icon(CupertinoIcons.search, size: 40, color: ios.tertiaryLabel),
+      Icon(Icons.search_rounded, size: 40, color: ios.tertiaryLabel),
       const SizedBox(height: 8),
       Text(
         'Nenhum resultado para "$q"',
@@ -172,7 +165,7 @@ List<Widget> _searchResults(BuildContext context, SheetNav nav, String q) {
               title: line.name,
               trailing: _StarButton(
                 active: favs.hasLine(line.id),
-                onTap: () => favs.toggleLine(line.id),
+                onTap: () => toggleLineFavorite(context, line.id),
               ),
               onTap: () => nav.push(LinePage(line.id)),
             ),
@@ -186,12 +179,12 @@ List<Widget> _searchResults(BuildContext context, SheetNav nav, String q) {
         children: [
           for (final stop in stops)
             IosRow(
-              leading: const IconTile(CupertinoIcons.bus, AppColors.gray),
+              leading: const IconTile(Icons.directions_bus_rounded, AppColors.gray),
               title: stop.name,
               subtitle: stop.address,
               trailing: _StarButton(
                 active: favs.hasStop(stop.id),
-                onTap: () => favs.toggleStop(stop.id),
+                onTap: () => toggleStopFavorite(context, stop.id),
               ),
               onTap: () => nav.push(StopPage(stop.id)),
             ),
@@ -215,11 +208,11 @@ class _StarButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Icon(
-          active ? CupertinoIcons.star_fill : CupertinoIcons.star,
+          active ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 20,
           color: active
               ? AppColors.orange
-              : IosColors.of(context).tertiaryLabel,
+              : AppPalette.of(context).tertiaryLabel,
         ),
       ),
     );

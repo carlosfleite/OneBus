@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
@@ -44,7 +43,7 @@ class NearestStopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     final near = nearestStop();
     final sim = BusSimulator.instance;
@@ -91,7 +90,7 @@ class NearestStopCard extends StatelessWidget {
                     ),
                   ),
                   Icon(
-                    CupertinoIcons.chevron_forward,
+                    Icons.chevron_right_rounded,
                     size: 16,
                     color: ios.tertiaryLabel,
                   ),
@@ -151,7 +150,7 @@ class StopListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -162,7 +161,7 @@ class StopListRow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             IconTile(
-              CupertinoIcons.bus,
+              Icons.directions_bus_rounded,
               isNearest ? ios.tint : AppColors.gray,
               size: 32,
             ),
@@ -194,7 +193,7 @@ class StopListRow extends StatelessWidget {
                       if (favorite) ...[
                         const SizedBox(width: 4),
                         const Icon(
-                          CupertinoIcons.star_fill,
+                          Icons.star_rounded,
                           size: 13,
                           color: AppColors.orange,
                         ),
@@ -215,7 +214,7 @@ class StopListRow extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Icon(
-                  CupertinoIcons.chevron_forward,
+                  Icons.chevron_right_rounded,
                   size: 16,
                   color: ios.tertiaryLabel,
                 ),

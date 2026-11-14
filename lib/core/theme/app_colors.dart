@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// OneBus palette: a bus-sign yellow for the brand, iOS system colors for
-/// everything interactive, and vivid line colors that read on the map.
+/// OneBus palette: deep black / graphite surfaces, an urban yellow for
+/// everything that asks for attention, and neutral grays for the rest.
 class AppColors {
   AppColors._();
 
   // Brand.
-  static const brandYellow = Color(0xFFFFC72C);
-  static const brandInk = Color(0xFF141414);
+  static const brandYellow = Color(0xFFFFD60A);
+  static const brandYellowAlt = Color(0xFFFACC15);
+  static const brandInk = Color(0xFF0D0D0F);
+  static const graphite = Color(0xFF16161A);
 
   // Line colors (white text must stay readable on them).
   static const lineBlue = Color(0xFF0A7AFF);
@@ -15,23 +17,24 @@ class AppColors {
   static const lineIndigo = Color(0xFF5856D6);
   static const lineOrange = Color(0xFFF2612E);
 
-  // iOS system colors (light / dark variants).
-  static const blue = Color(0xFF007AFF);
-  static const blueDark = Color(0xFF0A84FF);
-  static const green = Color(0xFF34C759);
-  static const greenDark = Color(0xFF30D158);
-  static const orange = Color(0xFFFF9500);
-  static const red = Color(0xFFFF3B30);
-  static const gray = Color(0xFF8E8E93);
+  // Semantic colors.
+  static const blue = Color(0xFF2F80ED);
+  static const green = Color(0xFF22C55E);
+  static const greenDark = Color(0xFF4ADE80);
+  static const orange = Color(0xFFF59E0B);
+  static const red = Color(0xFFEF4444);
+  static const gray = Color(0xFF71717A);
 }
 
-/// iOS semantic colors that Material's ColorScheme has no slot for.
+/// Semantic colors that Material's ColorScheme has no slot for. The field
+/// names are kept from the previous theme so every screen follows the new
+/// identity without changes.
 @immutable
-class IosColors extends ThemeExtension<IosColors> {
-  /// Grouped list background (behind inset sections).
+class AppPalette extends ThemeExtension<AppPalette> {
+  /// Page background (behind inset sections).
   final Color groupedBackground;
 
-  /// Cell / card background inside grouped lists.
+  /// Card / row background inside lists.
   final Color cell;
 
   /// Translucent sheet material over the map.
@@ -43,10 +46,23 @@ class IosColors extends ThemeExtension<IosColors> {
 
   /// Search field / segmented control fill.
   final Color fill;
+
+  /// Color for links and text that must read on [cell] (a deep amber on
+  /// light surfaces, the brand yellow on dark ones).
   final Color tint;
+
+  /// Brand yellow for filled elements (buttons, active tab, badges).
+  final Color accent;
+
+  /// Text / icons drawn on top of [accent].
+  final Color onAccent;
+
+  /// Highlight surface (header, pass card, navigation bar).
+  final Color ink;
+  final Color onInk;
   final Color live;
 
-  const IosColors({
+  const AppPalette({
     required this.groupedBackground,
     required this.cell,
     required this.sheet,
@@ -56,46 +72,58 @@ class IosColors extends ThemeExtension<IosColors> {
     required this.separator,
     required this.fill,
     required this.tint,
+    required this.accent,
+    required this.onAccent,
+    required this.ink,
+    required this.onInk,
     required this.live,
   });
 
-  static const light = IosColors(
-    groupedBackground: Color(0xFFF2F2F7),
+  static const light = AppPalette(
+    groupedBackground: Color(0xFFF4F4F5),
     cell: Color(0xFFFFFFFF),
-    sheet: Color(0xF2F7F7F9),
-    label: Color(0xFF000000),
-    secondaryLabel: Color(0x993C3C43),
-    tertiaryLabel: Color(0x4D3C3C43),
-    separator: Color(0x4A3C3C43),
-    fill: Color(0x1F767680),
-    tint: AppColors.blue,
-    live: Color(0xFF1FA34A),
+    sheet: Color(0xF2FFFFFF),
+    label: Color(0xFF0D0D0F),
+    secondaryLabel: Color(0xFF5E5E66),
+    tertiaryLabel: Color(0xFF9A9AA3),
+    separator: Color(0xFFE4E4E7),
+    fill: Color(0xFFEDEDF0),
+    tint: Color(0xFF8A6100),
+    accent: AppColors.brandYellow,
+    onAccent: AppColors.brandInk,
+    ink: AppColors.brandInk,
+    onInk: Color(0xFFFFFFFF),
+    live: Color(0xFF15803D),
   );
 
-  static const dark = IosColors(
-    groupedBackground: Color(0xFF000000),
-    cell: Color(0xFF1C1C1E),
-    sheet: Color(0xEB1C1C1E),
-    label: Color(0xFFFFFFFF),
-    secondaryLabel: Color(0x99EBEBF5),
-    tertiaryLabel: Color(0x4DEBEBF5),
-    separator: Color(0x99545458),
-    fill: Color(0x3D767680),
-    tint: AppColors.blueDark,
+  static const dark = AppPalette(
+    groupedBackground: Color(0xFF0D0D0F),
+    cell: Color(0xFF16161A),
+    sheet: Color(0xEB16161A),
+    label: Color(0xFFF5F5F5),
+    secondaryLabel: Color(0xFFA1A1AA),
+    tertiaryLabel: Color(0xFF6B6B73),
+    separator: Color(0xFF26262C),
+    fill: Color(0xFF23232A),
+    tint: AppColors.brandYellow,
+    accent: AppColors.brandYellow,
+    onAccent: AppColors.brandInk,
+    ink: Color(0xFF000000),
+    onInk: Color(0xFFFFFFFF),
     live: AppColors.greenDark,
   );
 
-  static IosColors of(BuildContext context) =>
-      Theme.of(context).extension<IosColors>()!;
+  static AppPalette of(BuildContext context) =>
+      Theme.of(context).extension<AppPalette>()!;
 
   @override
-  IosColors copyWith() => this;
+  AppPalette copyWith() => this;
 
   @override
-  IosColors lerp(IosColors? other, double t) {
+  AppPalette lerp(AppPalette? other, double t) {
     if (other == null) return this;
     Color c(Color a, Color b) => Color.lerp(a, b, t)!;
-    return IosColors(
+    return AppPalette(
       groupedBackground: c(groupedBackground, other.groupedBackground),
       cell: c(cell, other.cell),
       sheet: c(sheet, other.sheet),
@@ -105,6 +133,10 @@ class IosColors extends ThemeExtension<IosColors> {
       separator: c(separator, other.separator),
       fill: c(fill, other.fill),
       tint: c(tint, other.tint),
+      accent: c(accent, other.accent),
+      onAccent: c(onAccent, other.onAccent),
+      ink: c(ink, other.ink),
+      onInk: c(onInk, other.onInk),
       live: c(live, other.live),
     );
   }

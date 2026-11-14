@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -310,7 +309,7 @@ class MapHomeState extends State<MapHome>
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final mq = MediaQuery.of(context);
     _screen = mq.size;
     _wide = mq.size.width >= _wideBreakpoint;
@@ -381,7 +380,7 @@ class MapHomeState extends State<MapHome>
               child: MapControlBox(
                 children: [
                   MapControlButton(
-                    icon: CupertinoIcons.square_stack_3d_up,
+                    icon: Icons.layers_rounded,
                     tooltip: 'Mostrar linhas nos pontos',
                     active: _showStopLines,
                     onTap: () =>
@@ -395,7 +394,7 @@ class MapHomeState extends State<MapHome>
                         setState(() => _onlyAccessible = !_onlyAccessible),
                   ),
                   MapControlButton(
-                    icon: CupertinoIcons.creditcard,
+                    icon: Icons.credit_card_outlined,
                     tooltip: 'Pontos de recarga',
                     active: _showRecharge || _showsRecharge,
                     onTap: () => setState(() => _showRecharge = !_showRecharge),
@@ -407,8 +406,8 @@ class MapHomeState extends State<MapHome>
                   ),
                   MapControlButton(
                     icon: _following
-                        ? CupertinoIcons.location_fill
-                        : CupertinoIcons.location,
+                        ? Icons.near_me_rounded
+                        : Icons.near_me_outlined,
                     tooltip: 'Centralizar',
                     active: _following,
                     onTap: () {
@@ -433,7 +432,7 @@ class MapHomeState extends State<MapHome>
 
   Widget _buildMap(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final focus = _focusLines;
     final selectedStop = switch (_page) {
       StopPage(:final stopId) => stopId,
@@ -612,7 +611,7 @@ class _SheetScroll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final grabber = showGrabber ? 17.0 : 12.0;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
@@ -681,7 +680,7 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return Container(
       decoration: BoxDecoration(
         color: color,

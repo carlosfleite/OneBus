@@ -3,7 +3,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:onebus/data/mock_data.dart';
+import 'package:onebus/features/tour/tour_controller.dart';
 import 'package:onebus/main.dart';
+import 'package:onebus/services/feed_service.dart';
 import 'package:onebus/services/auth_store.dart';
 import 'package:onebus/services/favorites_store.dart';
 import 'package:onebus/models/bus_route.dart';
@@ -14,6 +16,8 @@ void main() {
     'splash shows the slogan, then account creation on first launch',
     (WidgetTester tester) async {
       FavoritesStore.instance.notifyArrivals = false;
+      TourController.instance.skipForTests();
+      FeedService.loadingDelay = Duration.zero;
       SharedPreferences.setMockInitialValues({});
       await AuthStore.instance.deleteAccount();
       await tester.pumpWidget(const OneBusApp());

@@ -1,13 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/theme_controller.dart';
+import '../widgets/ds/app_segmented.dart';
 import '../widgets/ios.dart';
 import '../widgets/onebus_logo.dart';
 import '../services/auth_store.dart';
 import 'auth_screen.dart';
 import '../services/pass_store.dart';
+import '../features/tour/tour_controller.dart';
+import '../widgets/ds/app_sheets.dart';
+import '../widgets/ds/app_toast.dart';
 
 /// Account card: profile, pass, appearance.
 void showSettingsSheet(
@@ -19,9 +22,9 @@ void showSettingsSheet(
     isScrollControlled: true,
     useSafeArea: true,
     builder: (ctx) {
-      final ios = IosColors.of(ctx);
+      final ios = AppPalette.of(ctx);
       final text = Theme.of(ctx).textTheme;
-      return Padding(
+      return SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -40,12 +43,12 @@ void showSettingsSheet(
                 IosRow(
                   leading: CircleAvatar(
                     radius: 15,
-                    backgroundColor: AppColors.gray,
+                    backgroundColor: AppColors.brandYellow,
                     child: Text(
                       AuthStore.instance.initial,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                        color: AppColors.brandInk,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
@@ -56,7 +59,7 @@ void showSettingsSheet(
                   valueListenable: PassStore.instance,
                   builder: (context, v, _) => IosRow(
                     leading: const IconTile(
-                      CupertinoIcons.creditcard_fill,
+                      Icons.credit_card_rounded,
                       AppColors.brandInk,
                     ),
                     title: 'Passe OneBus',
@@ -86,18 +89,13 @@ void showSettingsSheet(
                     valueListenable: ThemeController.instance,
                     builder: (context, mode, _) => SizedBox(
                       width: double.infinity,
-                      child: CupertinoSlidingSegmentedControl<ThemeMode>(
-                        groupValue: mode,
-                        onValueChanged: (m) {
-                          if (m != null) ThemeController.instance.setMode(m);
-                        },
-                        children: const {
-                          ThemeMode.system: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 6),
-                            child: Text('Automático'),
-                          ),
-                          ThemeMode.light: Text('Claro'),
-                          ThemeMode.dark: Text('Escuro'),
+                      child: AppSegmented<ThemeMode>(
+                        value: mode,
+                        onChanged: ThemeController.instance.setMode,
+                        options: const {
+                          ThemeMode.system: 'Automático',
+                          ThemeMode.light: 'Claro',
+                          ThemeMode.dark: 'Escuro',
                         },
                       ),
                     ),
@@ -107,12 +105,37 @@ void showSettingsSheet(
             ),
             const SizedBox(height: 22),
             InsetGroup(
+              separatorIndent: 58,
               children: [
+                IosRow(
+                  leading: const IconTile(
+                    Icons.explore_rounded,
+                    AppColors.brandInk,
+                  ),
+                  title: 'Rever tour do app',
+                  subtitle: 'Uma volta rápida pelas abas',
+                  chevron: true,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    TourController.instance.start();
+                  },
+                ),
                 IosRow(
                   title: 'Sair',
                   titleColor: AppColors.red,
                   onTap: () async {
+                    final ok = await showConfirmDialog(
+                      ctx,
+                      title: 'Sair da conta?',
+                      message:
+                          'Você precisará entrar de novo para ver seus '
+                          'ônibus favoritos.',
+                      confirmLabel: 'Sair',
+                      destructive: true,
+                    );
+                    if (!ok || !ctx.mounted) return;
                     await AuthStore.instance.logout();
+                    AppToast.info('Você saiu da conta.');
                     if (ctx.mounted) replaceWith(ctx, const AuthScreen());
                   },
                 ),
@@ -129,7 +152,7 @@ void showSettingsSheet(
                     style: text.bodySmall?.copyWith(color: ios.secondaryLabel),
                   ),
                   Text(
-                    'Sem anúncios. Mapa © OpenStreetMap contributors.',
+                    'Mapa © OpenStreetMap contributors.',
                     style: text.labelMedium?.copyWith(color: ios.tertiaryLabel),
                   ),
                 ],

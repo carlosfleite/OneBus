@@ -1,46 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    The path below is replaced at build time by the value of the
+    `--base-href` argument given to `flutter build web`.
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <!-- viewport-fit=cover lets the app draw under the notch / Dynamic Island;
+       the app itself keeps content inside the safe areas. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Tudo sobre ônibus em um lugar só.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0D0D0F">
 
-  <!-- iOS meta tags & icons -->
+  <!-- iOS PWA -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="OneBus">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="manifest" href="manifest.json">
 
   <title>OneBus</title>
-  <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #0D0D0F;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
+    /* Opening screen shown until Flutter draws its first frame. */
+    #boot {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 22px;
+      background: #0D0D0F; transition: opacity .3s ease;
+    }
+    #boot img { width: 96px; height: 96px; border-radius: 22px; }
+    #boot .bar {
+      width: 120px; height: 4px; border-radius: 2px; overflow: hidden;
+      background: #26262C;
+    }
+    #boot .bar::after {
+      content: ""; display: block; width: 40%; height: 100%;
+      background: #FFD60A; border-radius: 2px;
+      animation: slide 1s ease-in-out infinite;
+    }
+    @keyframes slide { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+    /* Probe used to read the iOS safe-area insets (notch, home bar). */
+    #safe-probe {
+      position: fixed; visibility: hidden; pointer-events: none;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="safe-probe"></div>
+  <div id="boot" aria-hidden="true">
+    <img src="icons/Icon-192.png" alt="">
+    <div class="bar"></div>
+  </div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+    // Safe-area insets for Flutter (read in Dart via window.__onebusInsets).
+    (function () {
+      var probe = document.getElementById('safe-probe');
+      function read() {
+        var s = getComputedStyle(probe);
+        window.__onebusInsets = {
+          top: parseFloat(s.paddingTop) || 0,
+          bottom: parseFloat(s.paddingBottom) || 0,
+          left: parseFloat(s.paddingLeft) || 0,
+          right: parseFloat(s.paddingRight) || 0
+        };
+      }
+      read();
+      addEventListener('resize', read);
+      addEventListener('orientationchange', read);
+    })();
+
+    // Flutter's engine rewrites the viewport meta tag and drops
+    // `viewport-fit=cover`, which iOS needs to draw under the notch and to
+    // report the safe-area insets. Put it back whenever it disappears.
+    (function () {
+      function ensureCover() {
+        var m = document.querySelector('meta[name=viewport]');
+        if (m && (m.getAttribute('content') || '').indexOf('viewport-fit') < 0) {
+          m.setAttribute('content', m.getAttribute('content') + ', viewport-fit=cover');
+        }
+      }
+      ensureCover();
+      new MutationObserver(ensureCover).observe(document.head, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['content']
+      });
+    })();
+
+    // Hide the opening screen once Flutter has drawn.
+    window.addEventListener('flutter-first-frame', function () {
+      var boot = document.getElementById('boot');
+      if (!boot) return;
+      boot.style.opacity = '0';
+      setTimeout(function () { boot.remove(); }, 350);
+    });
+
+    // Service worker: fast loads and offline resilience without a stuck
+    // cache (core files are network-first; see onebus_sw.js).
+    if ('serviceWorker' in navigator) {
+      var hadController = !!navigator.serviceWorker.controller;
+      var updatePending = false;
+      var reloading = false;
+
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        // First install also fires this event; only a *replacement* of a
+        // running worker means a new app version is ready.
+        if (!hadController) { hadController = true; return; }
+        updatePending = true;
+      });
+
+      // Apply a pending update when the app comes back to the foreground,
+      // never in the middle of a task.
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState !== 'visible') return;
+        if (updatePending && !reloading) { reloading = true; location.reload(); return; }
+        navigator.serviceWorker.getRegistration().then(function (r) { r && r.update(); });
+      });
+
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('onebus_sw.js').catch(function (e) {
+          console.warn('Service worker não registrado', e);
+        });
+      });
+    }
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

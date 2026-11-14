@@ -31,8 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # Used by Flutter's own iOS-style text selection toolbar on Safari.
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   flutter_map: ^8.3.2
@@ -40,6 +39,13 @@ dependencies:
   shared_preferences: ^2.5.6
   flutter_local_notifications: ^22.3.2
   crypto: ^3.0.7
+  supabase_flutter: ^2.18.0
+  connectivity_plus: ^6.1.0
+  web: ^1.1.0
+  flutter_web_plugins:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

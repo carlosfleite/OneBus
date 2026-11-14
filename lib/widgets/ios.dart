@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
@@ -55,7 +54,7 @@ class InsetGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,7 +121,7 @@ class _IosRowState extends State<IosRow> {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -173,7 +172,7 @@ class _IosRowState extends State<IosRow> {
             if (widget.chevron) ...[
               const SizedBox(width: 6),
               Icon(
-                CupertinoIcons.chevron_forward,
+                Icons.chevron_right_rounded,
                 size: 16,
                 color: ios.tertiaryLabel,
               ),
@@ -251,7 +250,7 @@ class EtaLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final e = eta;
     if (e == null) {
       return Text('—', style: TextStyle(color: ios.secondaryLabel));
@@ -262,8 +261,8 @@ class EtaLabel extends StatelessWidget {
       children: [
         Icon(
           e.live
-              ? CupertinoIcons.antenna_radiowaves_left_right
-              : CupertinoIcons.clock,
+              ? Icons.sensors_rounded
+              : Icons.schedule_rounded,
           size: fontSize * 0.75,
           color: color,
         ),
@@ -291,12 +290,12 @@ class CloseCircle extends StatelessWidget {
   const CloseCircle({
     super.key,
     required this.onTap,
-    this.icon = CupertinoIcons.xmark,
+    this.icon = Icons.close_rounded,
   });
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -317,7 +316,7 @@ class MapControlBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -368,7 +367,7 @@ class MapControlButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return Tooltip(
       message: tooltip,
       child: GestureDetector(
@@ -403,7 +402,7 @@ class InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final c = color ?? ios.secondaryLabel;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

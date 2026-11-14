@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 
+import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 import '../services/pass_store.dart';
 import 'ios.dart';
@@ -24,7 +24,7 @@ class LowBalanceCard extends StatelessWidget {
             children: [
               IosRow(
                 leading: IconTile(
-                  CupertinoIcons.creditcard_fill,
+                  Icons.credit_card_rounded,
                   empty ? AppColors.red : AppColors.orange,
                 ),
                 title: empty ? 'Seu passe acabou' : 'Seu passe está acabando',

@@ -58,7 +58,7 @@ class _AdBannerState extends State<AdBanner> {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     return Semantics(
       label: 'Anúncio: ${_ad.brand}. ${_ad.text}',

@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 
 import '../core/theme/app_colors.dart';
 import '../data/mock_data.dart';
@@ -71,7 +71,7 @@ class AlertsCenter extends ChangeNotifier {
       final line = MockData.line(lineId);
       show(
         AppBanner(
-          icon: CupertinoIcons.bell_fill,
+          icon: Icons.notifications_rounded,
           color: AppColors.orange,
           title: 'Alerta criado',
           message:
@@ -87,7 +87,7 @@ class AlertsCenter extends ChangeNotifier {
     _alightWarned = false;
     show(
       AppBanner(
-        icon: CupertinoIcons.flag_fill,
+        icon: Icons.flag_rounded,
         color: AppColors.blue,
         title: 'Vamos te avisar',
         message: 'Você será avisado antes de ${MockData.stop(stopId).name}.',
@@ -105,7 +105,7 @@ class AlertsCenter extends ChangeNotifier {
     crowdReports[busId] = (level: level, at: DateTime.now());
     show(
       const AppBanner(
-        icon: CupertinoIcons.person_2_fill,
+        icon: Icons.groups_rounded,
         color: AppColors.green,
         title: 'Obrigado!',
         message:
@@ -118,7 +118,7 @@ class AlertsCenter extends ChangeNotifier {
   void reportProblem(String lineId, String problem) {
     show(
       AppBanner(
-        icon: CupertinoIcons.checkmark_seal_fill,
+        icon: Icons.verified_rounded,
         color: AppColors.green,
         title: 'Relato enviado',
         message:
@@ -152,7 +152,7 @@ class AlertsCenter extends ChangeNotifier {
         _arrival.remove(key);
         show(
           AppBanner(
-            icon: CupertinoIcons.bus,
+            icon: Icons.directions_bus_rounded,
             color: MockData.line(lineId).color,
             title: 'Linha ${MockData.line(lineId).number} chegando',
             message: '${eta.label} até ${MockData.stop(stopId).name}.',
@@ -171,7 +171,7 @@ class AlertsCenter extends ChangeNotifier {
     if (sim.currentStopOf(bus)?.id == a.stopId) {
       show(
         AppBanner(
-          icon: CupertinoIcons.flag_fill,
+          icon: Icons.flag_rounded,
           color: AppColors.blue,
           title: 'Desça agora',
           message: 'Você chegou em ${MockData.stop(a.stopId).name}.',
@@ -186,7 +186,7 @@ class AlertsCenter extends ChangeNotifier {
       _alightWarned = true;
       show(
         AppBanner(
-          icon: CupertinoIcons.flag_fill,
+          icon: Icons.flag_rounded,
           color: AppColors.blue,
           title: 'Prepare-se para descer',
           message: 'Próximo ponto: ${next.stop.name}. Dê o sinal.',
@@ -214,7 +214,7 @@ class AlertsCenter extends ChangeNotifier {
         final line = MockData.line(p.lineId);
         show(
           AppBanner(
-            icon: CupertinoIcons.star_fill,
+            icon: Icons.star_rounded,
             color: line.color,
             title: 'Linha ${line.number} chegando no seu ponto',
             message:

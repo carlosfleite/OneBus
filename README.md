@@ -2,14 +2,14 @@
 
 **Tudo sobre ônibus em um lugar só.**
 
-App de transporte público para Bauru-SP: ônibus ao vivo no mapa, todos os pontos com as linhas de cada um, ponto mais próximo, notificações de chegada dos favoritos, lotação e passe. App com abas e visual iOS (materiais translúcidos, listas agrupadas e um mapa com cartão deslizante).
+App de transporte público para Bauru-SP: ônibus ao vivo no mapa, todos os pontos com as linhas de cada um, ponto mais próximo, notificações de chegada dos favoritos, lotação e passe. App com abas, identidade própria em amarelo e preto e um mapa com cartão deslizante. Roda no celular e como **PWA instalável** (iPhone e Android): veja [docs/PWA_E_SUPABASE.md](docs/PWA_E_SUPABASE.md).
 
 ## Identidade
 
 - **Logo**: o numeral "1" desenhado como uma linha de ônibus de mapa de transporte, com uma estação em cada ponta, sobre um "squircle" amarelo-placa-de-ônibus. Código em `lib/widgets/onebus_logo.dart`.
 - **Wordmark**: `onebus` em Inter ExtraBold, com "bus" em tom mais claro.
-- **Cores**: amarelo da marca `#FFC72C` + tinta `#141414`; o resto da interface usa as cores do sistema iOS (azul `#007AFF`, cinzas semânticos, fundos agrupados).
-- **Tipografia**: Inter (a fonte aberta mais próxima da SF Pro), na escala de tamanhos da Apple.
+- **Cores**: preto/grafite (`#0D0D0F`, `#16161A`) nas superfícies de destaque e na barra de navegação; amarelo urbano (`#FFD60A`) nos botões, na aba ativa e nos selos; cinzas neutros e branco no resto. Tudo centralizado em `lib/core/theme` (`AppColors`, `AppPalette`, `AppTheme`).
+- **Tipografia**: Plus Jakarta Sans. Componentes base (botão, campo, toast, skeleton, estado vazio…) em `lib/widgets/ds`.
 - **Ícones do app** (web, Android e iOS) são gerados a partir da logo:
   ```
   flutter test tool/generate_icons_test.dart
@@ -21,10 +21,11 @@ App de transporte público para Bauru-SP: ônibus ao vivo no mapa, todos os pont
 
 ## Conta
 
-- No **primeiro acesso**, depois da abertura, aparece a tela **Crie sua conta** (nome, e-mail e senha).
-- A sessão fica salva: nas próximas vezes o app abre direto na Início.
-- A tela de login só volta se o usuário tocar em **Sair**, na tela Conta (avatar). Por lá também dá para criar outra conta.
-- A conta fica no aparelho (`services/auth_store.dart`), com a senha guardada como hash SHA-256 com salt, nunca em texto. Para ter conta em vários aparelhos, falta um backend (ex.: Firebase Auth).
+- No **primeiro acesso**, depois da abertura, aparece a tela **Crie sua conta** (nome, e-mail, senha com requisitos em tempo real e confirmação). O **tour guiado** explica as abas na primeira entrada; dá para rever em Conta > "Rever tour do app".
+- Há dois modos, escolhidos no build:
+  - **Supabase Auth** (com `SUPABASE_URL` e `SUPABASE_ANON_KEY` via `--dart-define`): confirmação por e-mail, login e **recuperação de senha** com link por e-mail.
+  - **Conta local** (sem as variáveis): fica no aparelho, com a senha guardada como hash SHA-256 com salt. Sem recuperação por e-mail.
+- A sessão fica salva; a tela de login só volta depois de **Sair** (com confirmação), na tela Conta (avatar).
 
 ## Abas
 

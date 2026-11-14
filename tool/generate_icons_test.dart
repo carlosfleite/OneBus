@@ -30,6 +30,7 @@ void main() {
   test('generate icons', () async {
     await _render('web/favicon.png', 64);
     await _render('web/icons/Icon-192.png', 192);
+    await _render('web/icons/apple-touch-icon.png', 180, square: true, contentScale: 0.86);
     await _render('web/icons/Icon-512.png', 512);
     await _render(
       'web/icons/Icon-maskable-192.png',

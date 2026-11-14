@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -6,6 +5,7 @@ import '../../data/mock_data.dart';
 import '../../services/alerts_center.dart';
 import '../../services/bus_simulator.dart';
 import '../../widgets/bus_mini_map.dart';
+import '../../widgets/ds/app_sheets.dart';
 import '../../widgets/ios.dart';
 import 'common.dart';
 import 'sheet_nav.dart';
@@ -15,7 +15,7 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
   final alerts = AlertsCenter.instance;
   final bus = sim.bus(busId);
   final line = MockData.line(bus.lineId);
-  final ios = IosColors.of(context);
+  final ios = AppPalette.of(context);
   final upcoming = sim.upcomingStopsOf(bus, count: 5);
   final atStop = sim.currentStopOf(bus);
   final sinceFix = sim.secondsSinceFix(bus);
@@ -45,14 +45,14 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
       ActionButtons([
         (
           icon: nav.following
-              ? CupertinoIcons.location_fill
-              : CupertinoIcons.location,
+              ? Icons.near_me_rounded
+              : Icons.near_me_outlined,
           label: nav.following ? 'Seguindo' : 'Seguir',
           primary: nav.following,
           onTap: nav.follow,
         ),
         (
-          icon: CupertinoIcons.flag,
+          icon: Icons.outlined_flag_rounded,
           label: 'Avisar descida',
           primary: false,
           onTap: () => _pickAlightStop(
@@ -62,7 +62,7 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
           ),
         ),
         (
-          icon: CupertinoIcons.exclamationmark_bubble,
+          icon: Icons.feedback_outlined,
           label: 'Reportar',
           primary: false,
           onTap: () => showReportSheet(context, line.id),
@@ -75,13 +75,13 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
         children: [
           if (!bus.hasSignal)
             const InfoPill(
-              icon: CupertinoIcons.wifi_slash,
+              icon: Icons.wifi_off_rounded,
               label: 'Sem sinal de GPS',
               color: AppColors.orange,
             )
           else
             InfoPill(
-              icon: CupertinoIcons.speedometer,
+              icon: Icons.speed_rounded,
               label: atStop != null
                   ? 'Parado no ponto'
                   : '${bus.speedKmh} km/h',
@@ -108,7 +108,7 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
             children: [
               IosRow(
                 leading: const IconTile(
-                  CupertinoIcons.wifi_slash,
+                  Icons.wifi_off_rounded,
                   AppColors.orange,
                 ),
                 title: 'Posição desatualizada',
@@ -125,14 +125,12 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
             children: [
               IosRow(
                 leading: const IconTile(
-                  CupertinoIcons.flag_fill,
+                  Icons.flag_rounded,
                   AppColors.blue,
                 ),
                 title: 'Aviso de descida ativo',
                 subtitle: MockData.stop(alerts.alight!.stopId).name,
-                trailing: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
+                trailing: TextButton(
                   onPressed: alerts.clearAlight,
                   child: const Text('Cancelar'),
                 ),
@@ -149,8 +147,8 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
               leading: Icon(
                 alerts.alight?.busId == busId &&
                         alerts.alight?.stopId == u.stop.id
-                    ? CupertinoIcons.flag_fill
-                    : CupertinoIcons.circle,
+                    ? Icons.flag_rounded
+                    : Icons.circle_outlined,
                 size: 20,
                 color: line.color,
               ),
@@ -214,18 +212,24 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 3),
-                      child: CupertinoButton(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        minimumSize: Size.zero,
+                      child: Material(
                         color: ios.fill,
-                        borderRadius: BorderRadius.circular(8),
-                        onPressed: () => alerts.reportCrowding(busId, c),
-                        child: Text(
-                          c.label,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: ios.tint,
-                            fontWeight: FontWeight.w600,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => alerts.reportCrowding(busId, c),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            child: Center(
+                              child: Text(
+                                c.label,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: ios.label,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -253,26 +257,17 @@ String _ago(DateTime t) {
 }
 
 void _pickAlightStop(BuildContext context, String busId, List<String> stopIds) {
-  showCupertinoModalPopup<void>(
-    context: context,
-    builder: (ctx) => CupertinoActionSheet(
-      title: const Text('Em qual ponto você vai descer?'),
-      message: const Text('Avisamos 1 minuto antes, para você dar o sinal.'),
-      actions: [
-        for (final id in stopIds)
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.pop(ctx);
-              AlertsCenter.instance.setAlight(busId, id);
-            },
-            child: Text(MockData.stop(id).name),
-          ),
-      ],
-      cancelButton: CupertinoActionSheetAction(
-        isDefaultAction: true,
-        onPressed: () => Navigator.pop(ctx),
-        child: const Text('Cancelar'),
-      ),
-    ),
+  showActionSheet(
+    context,
+    title: 'Em qual ponto você vai descer?',
+    message: 'Avisamos 1 minuto antes, para você dar o sinal.',
+    actions: [
+      for (final id in stopIds)
+        SheetAction(
+          MockData.stop(id).name,
+          () => AlertsCenter.instance.setAlight(busId, id),
+          icon: Icons.location_on_outlined,
+        ),
+    ],
   );
 }

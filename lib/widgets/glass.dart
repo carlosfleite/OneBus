@@ -15,7 +15,7 @@ class GlassFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -47,7 +47,7 @@ class BannerHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     return ValueListenableBuilder<AppBanner?>(
       valueListenable: listenable,

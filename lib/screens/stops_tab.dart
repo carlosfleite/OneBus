@@ -1,11 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../data/mock_data.dart';
 import '../services/bus_simulator.dart';
 import '../services/favorites_store.dart';
+import '../services/feed_service.dart';
 import '../services/nearby.dart';
+import '../widgets/ds/app_search_field.dart';
+import '../widgets/ds/empty_state.dart';
+import '../widgets/ds/skeleton.dart';
+import '../widgets/favorite_actions.dart';
 import '../widgets/ios.dart';
 import '../widgets/stop_widgets.dart';
 import '../widgets/tab_page.dart';
@@ -40,11 +44,12 @@ class _StopsTabState extends State<StopsTab> {
   @override
   Widget build(BuildContext context) {
     final nav = AppNav.of(context);
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return ListenableBuilder(
       listenable: Listenable.merge([
         BusSimulator.instance,
         FavoritesStore.instance,
+        FeedService.instance,
       ]),
       builder: (context, _) {
         final favs = FavoritesStore.instance;
@@ -75,13 +80,13 @@ class _StopsTabState extends State<StopsTab> {
               ),
             ),
             GestureDetector(
-              onTap: () => favs.toggleStop(n.stop.id),
+              onTap: () => toggleStopFavorite(context, n.stop.id),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 12, 14, 12),
                 child: Icon(
                   favs.hasStop(n.stop.id)
-                      ? CupertinoIcons.star_fill
-                      : CupertinoIcons.star,
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
                   size: 20,
                   color: favs.hasStop(n.stop.id)
                       ? AppColors.orange
@@ -94,19 +99,14 @@ class _StopsTabState extends State<StopsTab> {
 
         return TabPage(
           title: 'Pontos',
-          trailing: CupertinoButton(
-            padding: EdgeInsets.zero,
-            minimumSize: Size.zero,
+          trailing: TextButton(
             onPressed: () => nav.openOnMap(const HomePage()),
             child: const Text('Ver no mapa'),
           ),
           children: [
-            CupertinoSearchTextField(
+            AppSearchField(
               controller: _search,
               placeholder: 'Buscar ponto ou bairro',
-              backgroundColor: ios.fill,
-              style: Theme.of(context).textTheme.bodyLarge,
-              itemColor: ios.secondaryLabel,
             ),
             const SizedBox(height: 12),
             SizedBox(
@@ -143,6 +143,15 @@ class _StopsTabState extends State<StopsTab> {
                 ],
               ),
             ),
+            if (FeedService.instance.loading) ...[
+              const SectionHeader('Carregando pontos'),
+              const SkeletonList(count: 4),
+            ] else if (FeedService.instance.failed)
+              EmptyState.error(
+                title: 'Não foi possível carregar os pontos',
+                onAction: FeedService.instance.refresh,
+              )
+            else ...[
             if (nearestShown.isNotEmpty) ...[
               const SectionHeader('Mais próximo de você'),
               InsetGroup(children: [row(nearestShown.first)]),
@@ -159,17 +168,22 @@ class _StopsTabState extends State<StopsTab> {
                   'Toque para ver no mapa; estrela para favoritar.',
               children: [
                 if (others.isEmpty && nearestShown.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text(
-                      'Nenhum ponto encontrado.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: ios.secondaryLabel),
-                    ),
+                  EmptyState(
+                    icon: Icons.search_off_rounded,
+                    title: 'Nenhum ponto encontrado',
+                    message: 'Tente outro nome de rua ou bairro, ou remova '
+                        'os filtros.',
+                    actionLabel: 'Limpar busca e filtros',
+                    onAction: () => setState(() {
+                      _search.clear();
+                      _line = null;
+                      _onlyAccessible = false;
+                    }),
                   ),
                 for (final n in others) row(n),
               ],
             ),
+            ],
           ],
         );
       },
@@ -190,7 +204,7 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(

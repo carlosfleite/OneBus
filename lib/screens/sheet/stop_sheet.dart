@@ -1,12 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../data/mock_data.dart';
-import 'package:flutter/material.dart' show Icons;
 
 import '../../services/alerts_center.dart';
 import '../../services/bus_simulator.dart';
 import '../../services/favorites_store.dart';
+import '../../widgets/favorite_actions.dart';
 import '../../widgets/ios.dart';
 import 'common.dart';
 import 'sheet_nav.dart';
@@ -16,7 +16,7 @@ SheetContent buildStopSheet(BuildContext context, SheetNav nav, String stopId) {
   final alerts = AlertsCenter.instance;
   final favs = FavoritesStore.instance;
   final stop = MockData.stop(stopId);
-  final ios = IosColors.of(context);
+  final ios = AppPalette.of(context);
 
   final arrivals =
       [
@@ -39,7 +39,7 @@ SheetContent buildStopSheet(BuildContext context, SheetNav nav, String stopId) {
       actions: [
         FavoriteCircle(
           active: favs.hasStop(stopId),
-          onTap: () => favs.toggleStop(stopId),
+          onTap: () => toggleStopFavorite(context, stopId),
         ),
       ],
       onClose: nav.pop,
@@ -80,8 +80,8 @@ SheetContent buildStopSheet(BuildContext context, SheetNav nav, String stopId) {
                     onTap: () => alerts.toggleArrivalAlert(a.line.id, stopId),
                     child: Icon(
                       alerts.hasArrivalAlert(a.line.id, stopId)
-                          ? CupertinoIcons.bell_fill
-                          : CupertinoIcons.bell,
+                          ? Icons.notifications_rounded
+                          : Icons.notifications_none_rounded,
                       size: 22,
                       color: alerts.hasArrivalAlert(a.line.id, stopId)
                           ? AppColors.orange

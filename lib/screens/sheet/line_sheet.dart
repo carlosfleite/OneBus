@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -6,6 +5,7 @@ import '../../data/mock_data.dart';
 import '../../models/bus_line.dart';
 import '../../services/bus_simulator.dart';
 import '../../services/favorites_store.dart';
+import '../../widgets/favorite_actions.dart';
 import '../../widgets/ios.dart';
 import 'common.dart';
 import 'sheet_nav.dart';
@@ -70,7 +70,7 @@ SheetContent buildLineSheet(BuildContext context, SheetNav nav, String lineId) {
       actions: [
         FavoriteCircle(
           active: favs.hasLine(lineId),
-          onTap: () => favs.toggleLine(lineId),
+          onTap: () => toggleLineFavorite(context, lineId),
         ),
       ],
       onClose: nav.pop,
@@ -78,7 +78,7 @@ SheetContent buildLineSheet(BuildContext context, SheetNav nav, String lineId) {
     body: [
       ActionButtons([
         (
-          icon: CupertinoIcons.location_fill,
+          icon: Icons.near_me_rounded,
           label: 'Próximo ônibus',
           primary: true,
           onTap: () {
@@ -87,7 +87,7 @@ SheetContent buildLineSheet(BuildContext context, SheetNav nav, String lineId) {
           },
         ),
         (
-          icon: CupertinoIcons.exclamationmark_bubble,
+          icon: Icons.feedback_outlined,
           label: 'Reportar',
           primary: false,
           onTap: () => showReportSheet(context, lineId),
@@ -115,7 +115,7 @@ SheetContent buildLineSheet(BuildContext context, SheetNav nav, String lineId) {
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: IosColors.of(context).fill,
+                      color: AppPalette.of(context).fill,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -199,7 +199,7 @@ class _StopTimelineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -257,7 +257,7 @@ class _BusTimelineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final noSignal = !bus.hasSignal;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -279,7 +279,7 @@ class _BusTimelineRow extends StatelessWidget {
                     border: Border.all(color: ios.cell, width: 2),
                   ),
                   child: const Icon(
-                    CupertinoIcons.bus,
+                    Icons.directions_bus_rounded,
                     size: 13,
                     color: Colors.white,
                   ),
@@ -301,7 +301,7 @@ class _BusTimelineRow extends StatelessWidget {
                 ),
               ),
               Icon(
-                CupertinoIcons.chevron_forward,
+                Icons.chevron_right_rounded,
                 size: 14,
                 color: ios.tertiaryLabel,
               ),

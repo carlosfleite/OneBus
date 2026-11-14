@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
@@ -9,7 +8,10 @@ import '../services/alerts_center.dart';
 import '../services/auth_store.dart';
 import '../services/bus_simulator.dart';
 import '../services/favorites_store.dart';
+import '../services/feed_service.dart';
 import '../services/nearby.dart';
+import '../widgets/ds/empty_state.dart';
+import '../widgets/ds/skeleton.dart';
 import '../widgets/glass.dart';
 import '../widgets/ios.dart';
 import '../widgets/ad_banner.dart';
@@ -50,7 +52,7 @@ class HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = AppNav.of(context);
     final favs = FavoritesStore.instance;
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final top = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -141,7 +143,7 @@ class _TopBar extends StatelessWidget {
         MapControlBox(
           children: [
             MapControlButton(
-              icon: CupertinoIcons.arrow_up_left_arrow_down_right,
+              icon: Icons.open_in_full_rounded,
               tooltip: 'Abrir mapa completo',
               onTap: onExpand,
             ),
@@ -160,7 +162,7 @@ class _HomeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nav = AppNav.of(context);
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
 
     return ListenableBuilder(
@@ -168,6 +170,7 @@ class _HomeCard extends StatelessWidget {
         BusSimulator.instance,
         FavoritesStore.instance,
         AlertsCenter.instance,
+        FeedService.instance,
       ]),
       builder: (context, _) {
         final favs = FavoritesStore.instance;
@@ -211,7 +214,7 @@ class _HomeCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(CupertinoIcons.search, color: ios.label, size: 20),
+                    Icon(Icons.search_rounded, color: ios.label, size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -234,28 +237,29 @@ class _HomeCard extends StatelessWidget {
               ),
             SectionHeader(
               'Seus ônibus',
-              trailing: CupertinoButton(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
+              trailing: TextButton(
                 onPressed: () => nav.select(AppTab.favorites),
-                child: const Text('Editar', style: TextStyle(fontSize: 15)),
+                child: const Text('Editar'),
               ),
             ),
-            if (rides.isEmpty)
-              InsetGroup(
-                children: [
-                  IosRow(
-                    leading: const IconTile(
-                      CupertinoIcons.star_fill,
-                      AppColors.orange,
-                    ),
-                    title: 'Escolha seus ônibus',
-                    subtitle: 'Favorite linhas para acompanhar a chegada aqui.',
-                    chevron: true,
-                    onTap: () => nav.select(AppTab.favorites),
-                  ),
-                ],
+            if (FeedService.instance.loading)
+              const SkeletonList(count: 2)
+            else if (FeedService.instance.failed)
+              EmptyState.error(
+                title: 'Não foi possível atualizar',
+                onAction: FeedService.instance.refresh,
+              )
+            else if (rides.isEmpty)
+              EmptyState(
+                icon: Icons.star_outline_rounded,
+                title: 'Escolha seus ônibus',
+                message:
+                    'Favorite linhas e pontos para acompanhar a chegada '
+                    'aqui e receber avisos.',
+                actionLabel: 'Escolher favoritos',
+                onAction: () => nav.select(AppTab.favorites),
               ),
+            if (!FeedService.instance.loading && !FeedService.instance.failed)
             for (final r in rides) ...[
               _RideCard(
                 line: r.line,
@@ -291,7 +295,7 @@ class _HomeCard extends StatelessWidget {
                 ),
                 IosRow(
                   leading: const IconTile(
-                    CupertinoIcons.placemark_fill,
+                    Icons.location_on_rounded,
                     AppColors.lineIndigo,
                   ),
                   title: 'Todos os pontos',
@@ -326,7 +330,7 @@ class _RideCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = AppNav.of(context);
     final sim = BusSimulator.instance;
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final text = Theme.of(context).textTheme;
     final eta = sim.eta(line.id, stop.id);
     final bus = sim.nextBusAt(line.id, stop.id);
@@ -373,7 +377,7 @@ class _RideCard extends StatelessWidget {
                         children: [
                           if (notify) ...[
                             Icon(
-                              CupertinoIcons.bell_fill,
+                              Icons.notifications_rounded,
                               size: 12,
                               color: ios.secondaryLabel,
                             ),
@@ -414,7 +418,7 @@ class _RideCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(CupertinoIcons.bus, size: 13, color: ios.secondaryLabel),
+                Icon(Icons.directions_bus_rounded, size: 13, color: ios.secondaryLabel),
                 const SizedBox(width: 5),
                 Expanded(
                   child: Text(

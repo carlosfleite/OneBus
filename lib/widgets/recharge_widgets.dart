@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
@@ -7,7 +6,7 @@ import '../services/nearby.dart';
 import 'ios.dart';
 
 IconData rechargeIcon(RechargeKind kind) => switch (kind) {
-  RechargeKind.terminal => CupertinoIcons.bus,
+  RechargeKind.terminal => Icons.directions_bus_rounded,
   RechargeKind.loterica => Icons.local_activity_rounded,
   RechargeKind.banca => Icons.storefront_rounded,
   RechargeKind.farmacia => Icons.local_pharmacy_rounded,
@@ -44,7 +43,7 @@ class RechargeRow extends StatelessWidget {
         near.walkLabel,
         style: TextStyle(
           fontSize: 13,
-          color: open ? IosColors.of(context).secondaryLabel : AppColors.red,
+          color: open ? AppPalette.of(context).secondaryLabel : AppColors.red,
         ),
       ),
       chevron: true,
@@ -80,7 +79,7 @@ class RechargePin extends StatelessWidget {
           ],
         ),
         child: Icon(
-          CupertinoIcons.creditcard_fill,
+          Icons.credit_card_rounded,
           size: s * 0.55,
           color: Colors.white,
         ),

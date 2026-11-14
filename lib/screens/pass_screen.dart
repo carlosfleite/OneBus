@@ -1,17 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../data/mock_data.dart';
 import '../services/alerts_center.dart';
 import '../services/auth_store.dart';
+import '../services/feed_service.dart';
 import '../services/nearby.dart';
 import '../services/pass_store.dart';
 import '../widgets/ad_banner.dart';
+import '../widgets/ds/app_sheets.dart';
+import '../widgets/ds/skeleton.dart';
 import '../widgets/ios.dart';
 import '../widgets/onebus_logo.dart';
 import '../widgets/pass_alert.dart';
 import '../widgets/recharge_widgets.dart';
+import '../widgets/tab_page.dart';
 import 'app_shell.dart';
 import 'sheet/sheet_nav.dart';
 
@@ -21,25 +24,32 @@ class PassScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final nav = AppNav.of(context);
     final nearby = rechargeByDistance().take(4);
     return Scaffold(
       backgroundColor: ios.groupedBackground,
-      body: CustomScrollView(
+      body: RefreshIndicator(
+        color: ios.onAccent,
+        backgroundColor: ios.accent,
+        onRefresh: defaultRefresh,
+        child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: const Text('Passe'),
-            automaticallyImplyLeading: false,
-            transitionBetweenRoutes: false,
-            backgroundColor: ios.groupedBackground.withValues(alpha: 0.9),
-            border: null,
-          ),
+          const LargeTitleBar(title: 'Passe'),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                const _PassCard(),
+                ListenableBuilder(
+                  listenable: FeedService.instance,
+                  builder: (context, _) => FeedService.instance.loading
+                      ? const AspectRatio(
+                          aspectRatio: 1.586,
+                          child: Skeleton(radius: 20),
+                        )
+                      : const _PassCard(),
+                ),
                 const LowBalanceCard(),
                 const SizedBox(height: 16),
                 FilledButton(
@@ -48,17 +58,16 @@ class PassScreen extends StatelessWidget {
                 ),
                 SectionHeader(
                   'Pontos de recarga',
-                  trailing: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
+                  trailing: TextButton(
                     onPressed: () => nav.openOnMap(const RechargeListPage()),
-                    child: const Text(
-                      'Ver no mapa',
-                      style: TextStyle(fontSize: 15),
-                    ),
+                    child: const Text('Ver no mapa'),
                   ),
                 ),
-                InsetGroup(
+                ListenableBuilder(
+                  listenable: FeedService.instance,
+                  builder: (context, _) => FeedService.instance.loading
+                      ? const SkeletonList(count: 3)
+                      : InsetGroup(
                   separatorIndent: 58,
                   footer:
                       'A recarga pelo app tem taxa de serviço de '
@@ -71,6 +80,7 @@ class PassScreen extends StatelessWidget {
                         onTap: () => nav.openOnMap(RechargePage(n.point.id)),
                       ),
                   ],
+                ),
                 ),
                 const SizedBox(height: 16),
                 const AdBanner(),
@@ -100,7 +110,7 @@ class PassScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                CupertinoButton(
+                TextButton(
                   onPressed: PassStore.instance.chargeFare,
                   child: const Text('Simular embarque (− R\$ 5,00)'),
                 ),
@@ -109,47 +119,38 @@ class PassScreen extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
   void _recharge(BuildContext context) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (ctx) => CupertinoActionSheet(
-        title: const Text('Valor da recarga'),
-        message: const Text(
+    showActionSheet(
+      context,
+      title: 'Valor da recarga',
+      message:
           'Para facilitar sua vida e manter o app rodando liso, incluímos '
           'apenas uma taxinha de serviço na sua recarga :)',
-        ),
-        actions: [
-          for (final v in const [10.0, 20.0, 50.0])
-            CupertinoActionSheetAction(
-              onPressed: () {
-                Navigator.pop(ctx);
-                PassStore.instance.recharge(v);
-                AlertsCenter.instance.show(
-                  AppBanner(
-                    icon: CupertinoIcons.creditcard_fill,
-                    color: AppColors.brandInk,
-                    title: 'Recarga confirmada',
-                    message:
-                        '${formatMoney(v)} adicionados ao seu passe. '
-                        'Total cobrado: ${formatMoney(v + PassStore.rechargeFee)} '
-                        '(taxa de serviço ${formatMoney(PassStore.rechargeFee)}).',
-                  ),
-                );
-              },
-              child: Text(
-                '${formatMoney(v)}  ·  paga ${formatMoney(v + PassStore.rechargeFee)}',
-              ),
-            ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          onPressed: () => Navigator.pop(ctx),
-          child: const Text('Cancelar'),
-        ),
-      ),
+      actions: [
+        for (final v in const [10.0, 20.0, 50.0])
+          SheetAction(
+            '${formatMoney(v)}  ·  paga ${formatMoney(v + PassStore.rechargeFee)}',
+            () {
+              PassStore.instance.recharge(v);
+              AlertsCenter.instance.show(
+                AppBanner(
+                  icon: Icons.credit_card_rounded,
+                  color: AppColors.brandInk,
+                  title: 'Recarga confirmada',
+                  message:
+                      '${formatMoney(v)} adicionados ao seu passe. '
+                      'Total cobrado: ${formatMoney(v + PassStore.rechargeFee)} '
+                      '(taxa de serviço ${formatMoney(PassStore.rechargeFee)}).',
+                ),
+              );
+            },
+            icon: Icons.add_card_rounded,
+          ),
+      ],
     );
   }
 }
@@ -166,7 +167,9 @@ class _PassCard extends StatelessWidget {
         decoration: ShapeDecoration(
           color: AppColors.brandInk,
           shape: RoundedSuperellipseBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
+            // Keeps the black card visible on the dark theme background.
+            side: const BorderSide(color: Color(0xFF3A3A42), width: 1.2),
           ),
           shadows: const [
             BoxShadow(

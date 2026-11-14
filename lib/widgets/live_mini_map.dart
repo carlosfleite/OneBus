@@ -58,7 +58,7 @@ class _LiveMiniMapState extends State<LiveMiniMap>
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final lines = widget.lineIds.isEmpty
         ? MockData.lines.map((l) => l.id).toSet()
         : widget.lineIds;

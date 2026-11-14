@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 
@@ -78,7 +77,7 @@ class StopPin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final highlight = selected || nearest != null;
     final s = highlight ? 28.0 : 20.0;
     return Stack(
@@ -105,7 +104,7 @@ class StopPin extends StatelessWidget {
             ],
           ),
           child: Icon(
-            CupertinoIcons.bus,
+            Icons.directions_bus_rounded,
             size: s * 0.62,
             color: highlight ? Colors.white : ios.secondaryLabel,
           ),

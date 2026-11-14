@@ -6,12 +6,16 @@ import '../core/theme/app_colors.dart';
 import '../widgets/onebus_logo.dart';
 import '../services/auth_store.dart';
 import 'app_shell.dart';
+import 'auth/reset_password_screen.dart';
 import 'auth_screen.dart';
 
 /// Opening sequence: the icon springs in, the "1" route draws itself, a bus
 /// runs along it, then the wordmark and slogan settle in before the map.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  /// True once the opening sequence handed over to the app.
+  static bool finished = false;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -44,11 +48,16 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _goHome() {
     if (!mounted) return;
-    // Only the first access (or after "Sair") goes through the account
-    // screen; otherwise straight into the app.
+    SplashScreen.finished = true;
+    final auth = AuthStore.instance;
+    // Opened from the password-recovery e-mail: set the new password.
+    // Otherwise only the first access (or after "Sair") goes through the
+    // account screen; logged-in users go straight into the app.
     replaceWith(
       context,
-      AuthStore.instance.loggedIn ? const AppShell() : const AuthScreen(),
+      auth.recoveryPending.value
+          ? const ResetPasswordScreen()
+          : (auth.loggedIn ? const AppShell() : const AuthScreen()),
     );
   }
 
@@ -61,11 +70,10 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final secondary = theme.colorScheme.onSurfaceVariant;
+    const secondary = Colors.white70;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.white,
+      backgroundColor: AppColors.brandInk,
       body: AnimatedBuilder(
         animation: _c,
         builder: (context, _) => Stack(
@@ -91,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _word.value,
                     child: Transform.translate(
                       offset: Offset(0, 14 * (1 - _word.value)),
-                      child: const OneBusWordmark(fontSize: 40),
+                      child: const OneBusWordmark(fontSize: 40, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -168,7 +176,7 @@ class _AnimatedIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(size * 0.225),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.14),
+            color: AppColors.brandYellow.withValues(alpha: 0.25),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),

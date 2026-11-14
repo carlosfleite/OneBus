@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/theme/app_colors.dart';
@@ -76,7 +76,7 @@ class PassStore extends ValueNotifier<double> {
     _warned = level;
     AlertsCenter.instance.show(
       AppBanner(
-        icon: CupertinoIcons.creditcard_fill,
+        icon: Icons.credit_card_rounded,
         color: level == _Level.empty ? AppColors.red : AppColors.orange,
         title: level == _Level.empty
             ? 'Seu passe acabou'

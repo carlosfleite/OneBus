@@ -1,113 +1,171 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// iOS-flavoured theme: Inter (closest open font to SF Pro), Apple's type
-/// ramp and semantic colors, flat surfaces, no Material tints or ripples.
+/// OneBus design system: black & yellow, Plus Jakarta Sans, generous radii.
 class AppTheme {
   AppTheme._();
 
-  static ThemeData light() => _build(Brightness.light, IosColors.light);
+  /// Corner radius shared by cards, fields and buttons.
+  static const radius = 16.0;
 
-  static ThemeData dark() => _build(Brightness.dark, IosColors.dark);
+  static ThemeData light() => _build(Brightness.light, AppPalette.light);
 
-  static ThemeData _build(Brightness brightness, IosColors ios) {
+  static ThemeData dark() => _build(Brightness.dark, AppPalette.dark);
+
+  static ThemeData _build(Brightness brightness, AppPalette p) {
     final scheme = ColorScheme.fromSeed(
-      seedColor: ios.tint,
+      seedColor: AppColors.brandYellow,
       brightness: brightness,
-      primary: ios.tint,
-      onPrimary: Colors.white,
-      surface: ios.cell,
-      onSurface: ios.label,
-      onSurfaceVariant: ios.secondaryLabel,
-      outlineVariant: ios.separator,
+      primary: p.accent,
+      onPrimary: p.onAccent,
+      secondary: p.ink,
+      onSecondary: p.onInk,
+      surface: p.cell,
+      onSurface: p.label,
+      onSurfaceVariant: p.secondaryLabel,
+      outlineVariant: p.separator,
       error: AppColors.red,
-    );
-    final base = ThemeData(
-      useMaterial3: true,
-      brightness: brightness,
-      colorScheme: scheme,
-      scaffoldBackgroundColor: ios.groupedBackground,
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: ios.fill,
-      cupertinoOverrideTheme: CupertinoThemeData(
-        brightness: brightness,
-        primaryColor: ios.tint,
-        textTheme: CupertinoTextThemeData(
-          primaryColor: ios.tint,
-          textStyle: GoogleFonts.inter(fontSize: 17, color: ios.label),
-          actionTextStyle: GoogleFonts.inter(fontSize: 17, color: ios.tint),
-          navTitleTextStyle: GoogleFonts.inter(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.4,
-            color: ios.label,
-          ),
-          navLargeTitleTextStyle: GoogleFonts.inter(
-            fontSize: 34,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.8,
-            color: ios.label,
-          ),
-          navActionTextStyle: GoogleFonts.inter(fontSize: 17, color: ios.tint),
-        ),
-      ),
     );
 
     TextStyle s(double size, FontWeight w, {double spacing = 0}) =>
-        GoogleFonts.inter(
+        GoogleFonts.plusJakartaSans(
           fontSize: size,
           fontWeight: w,
           letterSpacing: spacing,
-          color: ios.label,
-          height: 1.25,
+          color: p.label,
+          height: 1.3,
         );
 
-    // Apple HIG type ramp.
     final text = TextTheme(
-      displaySmall: s(34, FontWeight.w700, spacing: -0.8), // Large Title
-      headlineMedium: s(28, FontWeight.w700, spacing: -0.6), // Title 1
-      headlineSmall: s(22, FontWeight.w700, spacing: -0.4), // Title 2
-      titleLarge: s(20, FontWeight.w600, spacing: -0.4), // Title 3
-      titleMedium: s(17, FontWeight.w600, spacing: -0.4), // Headline
-      bodyLarge: s(17, FontWeight.w400, spacing: -0.4), // Body
-      bodyMedium: s(15, FontWeight.w400, spacing: -0.2), // Subheadline
-      bodySmall: s(13, FontWeight.w400, spacing: -0.1), // Footnote
-      labelLarge: s(17, FontWeight.w500, spacing: -0.4),
-      labelMedium: s(12, FontWeight.w400), // Caption 1
-      labelSmall: s(11, FontWeight.w500, spacing: 0.1), // Caption 2
+      displaySmall: s(34, FontWeight.w800, spacing: -1), // Large title
+      headlineMedium: s(28, FontWeight.w800, spacing: -0.8), // Title 1
+      headlineSmall: s(22, FontWeight.w800, spacing: -0.5), // Title 2
+      titleLarge: s(20, FontWeight.w700, spacing: -0.4), // Title 3
+      titleMedium: s(16, FontWeight.w700, spacing: -0.2), // Headline
+      bodyLarge: s(16, FontWeight.w500, spacing: -0.2), // Body
+      bodyMedium: s(14, FontWeight.w500, spacing: -0.1), // Subheadline
+      bodySmall: s(12.5, FontWeight.w500), // Footnote
+      labelLarge: s(16, FontWeight.w700, spacing: -0.2),
+      labelMedium: s(12, FontWeight.w500), // Caption 1
+      labelSmall: s(11, FontWeight.w600, spacing: 0.1), // Caption 2
     );
 
-    return base.copyWith(
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(radius),
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: p.groupedBackground,
       textTheme: text,
-      extensions: [ios],
-      dividerTheme: DividerThemeData(color: ios.separator, thickness: 0.5),
+      extensions: [p],
+      splashFactory: InkRipple.splashFactory,
+      splashColor: p.accent.withValues(alpha: 0.18),
+      highlightColor: p.fill,
+      dividerTheme: DividerThemeData(color: p.separator, thickness: 1, space: 1),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: p.accent),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: ios.groupedBackground,
+        backgroundColor: p.groupedBackground,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        dragHandleColor: ios.tertiaryLabel,
-        dragHandleSize: const Size(36, 5),
+        dragHandleColor: p.tertiaryLabel,
+        dragHandleSize: const Size(40, 4),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: p.cell,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        titleTextStyle: text.titleLarge,
+        contentTextStyle: text.bodyMedium?.copyWith(color: p.secondaryLabel),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: ios.tint,
-          foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(50),
-          textStyle: text.titleMedium,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+          backgroundColor: p.accent,
+          foregroundColor: p.onAccent,
+          disabledBackgroundColor: p.accent.withValues(alpha: 0.4),
+          disabledForegroundColor: p.onAccent.withValues(alpha: 0.6),
+          minimumSize: const Size.fromHeight(54),
+          textStyle: text.labelLarge,
+          shape: shape,
+          elevation: 0,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: p.label,
+          minimumSize: const Size.fromHeight(54),
+          textStyle: text.labelLarge,
+          side: BorderSide(color: p.separator, width: 1.5),
+          shape: shape,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: ios.tint,
-          textStyle: text.bodyLarge,
+          foregroundColor: p.tint,
+          minimumSize: const Size(48, 48),
+          textStyle: text.labelLarge?.copyWith(fontSize: 15),
+          shape: shape,
         ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (st) => st.contains(WidgetState.selected) ? p.onAccent : p.cell,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (st) => st.contains(WidgetState.selected)
+              ? p.accent
+              : p.tertiaryLabel.withValues(alpha: 0.5),
+        ),
+        trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: p.cell,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        hintStyle: text.bodyLarge?.copyWith(color: p.tertiaryLabel),
+        labelStyle: text.bodyMedium?.copyWith(color: p.secondaryLabel),
+        floatingLabelStyle: text.labelMedium?.copyWith(
+          color: p.label,
+          fontWeight: FontWeight.w700,
+        ),
+        border: _border(p.separator, 1.5),
+        enabledBorder: _border(p.separator, 1.5),
+        focusedBorder: _border(p.accent, 2.5),
+        errorBorder: _border(AppColors.red, 1.5),
+        focusedErrorBorder: _border(AppColors.red, 2.5),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.brandInk,
+        contentTextStyle: text.bodyMedium?.copyWith(color: Colors.white),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 0,
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.macOS: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.windows: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.linux: FadeForwardsPageTransitionsBuilder(),
+        },
       ),
     );
   }
+
+  static OutlineInputBorder _border(Color color, double width) =>
+      OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radius),
+        borderSide: BorderSide(color: color, width: width),
+      );
 }

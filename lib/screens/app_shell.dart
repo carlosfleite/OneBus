@@ -1,11 +1,11 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
+import '../features/tour/tour_controller.dart';
+import '../features/tour/tour_overlay.dart';
 import '../services/alerts_center.dart';
 import '../services/bus_simulator.dart';
+import '../services/feed_service.dart';
 import '../services/pass_store.dart';
 import '../widgets/glass.dart';
 import 'favorites_tab.dart';
@@ -47,7 +47,51 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   final _sim = BusSimulator.instance;
   final _mapKey = GlobalKey<MapHomeState>();
+  final _tabKeys = {for (final t in AppTab.values) t: GlobalKey()};
   AppTab _tab = AppTab.home;
+
+  late final _tourSteps = [
+    TourStep(
+      icon: Icons.home_rounded,
+      title: 'Início',
+      body:
+          'Seus ônibus favoritos, o ponto mais próximo de você e os avisos '
+          'de desvios e obras, tudo logo ao abrir o app.',
+      target: _tabKeys[AppTab.home]!,
+    ),
+    TourStep(
+      icon: Icons.map_rounded,
+      title: 'Mapa ao vivo',
+      body:
+          'Acompanhe os ônibus em tempo real. Toque em um ônibus, linha ou '
+          'ponto para ver a chegada, a lotação e o trajeto.',
+      target: _tabKeys[AppTab.map]!,
+    ),
+    TourStep(
+      icon: Icons.location_on_rounded,
+      title: 'Pontos',
+      body:
+          'Todos os pontos, do mais próximo ao mais distante, com a próxima '
+          'chegada de cada linha. Toque na estrela para favoritar.',
+      target: _tabKeys[AppTab.stops]!,
+    ),
+    TourStep(
+      icon: Icons.credit_card_rounded,
+      title: 'Passe',
+      body:
+          'Veja o saldo, as últimas viagens e recarregue o passe. Também '
+          'mostramos os pontos de recarga mais perto de você.',
+      target: _tabKeys[AppTab.pass]!,
+    ),
+    TourStep(
+      icon: Icons.star_rounded,
+      title: 'Favoritos e avisos',
+      body:
+          'Escolha as linhas e os pontos que você usa e receba um aviso '
+          'quando o ônibus estiver chegando.',
+      target: _tabKeys[AppTab.favorites]!,
+    ),
+  ];
 
   @override
   void initState() {
@@ -55,10 +99,15 @@ class _AppShellState extends State<AppShell> {
     // The shell keeps the live feed running on every tab so arrival
     // notifications fire wherever the user is.
     _sim.addListener(_onPing);
-    // Warn right away when the pass is already running out.
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => PassStore.instance.checkOnLaunch(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Warn right away when the pass is already running out.
+      PassStore.instance.checkOnLaunch();
+      FeedService.instance.refresh();
+      // First access: guided tour (after the screen settles).
+      Future<void>.delayed(const Duration(milliseconds: 700), () {
+        if (mounted) TourController.instance.startIfFirstTime();
+      });
+    });
   }
 
   @override
@@ -92,115 +141,149 @@ class _AppShellState extends State<AppShell> {
     return AppNav(
       select: _select,
       openOnMap: _openOnMap,
-      child: Scaffold(
-        body: Stack(
-          children: [
-            IndexedStack(
-              index: _tab.index,
+      child: Stack(
+        children: [
+          Scaffold(
+            body: Stack(
               children: [
-                for (final t in AppTab.values)
-                  TickerMode(enabled: t == _tab, child: tabs[t]!),
+                IndexedStack(
+                  index: _tab.index,
+                  children: [
+                    for (final t in AppTab.values)
+                      TickerMode(enabled: t == _tab, child: tabs[t]!),
+                  ],
+                ),
+                Positioned(
+                  left: 8,
+                  right: 8,
+                  top: mq.padding.top + 8,
+                  child: BannerHost(
+                    listenable: AlertsCenter.instance.banner,
+                    onTap: AlertsCenter.instance.dismiss,
+                  ),
+                ),
               ],
             ),
-            Positioned(
-              left: 8,
-              right: 8,
-              top: mq.padding.top + 8,
-              child: BannerHost(
-                listenable: AlertsCenter.instance.banner,
-                onTap: AlertsCenter.instance.dismiss,
-              ),
+            bottomNavigationBar: _AppTabBar(
+              current: _tab,
+              onSelect: _select,
+              keys: _tabKeys,
             ),
-          ],
-        ),
-        bottomNavigationBar: _IosTabBar(current: _tab, onSelect: _select),
+          ),
+          ListenableBuilder(
+            listenable: TourController.instance,
+            builder: (context, _) => TourController.instance.active
+                ? Positioned.fill(
+                    child: TourOverlay(
+                      steps: _tourSteps,
+                      onStep: (i) => _select(AppTab.values[i]),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _IosTabBar extends StatelessWidget {
+/// Black bottom bar; the active tab gets a yellow pill.
+class _AppTabBar extends StatelessWidget {
   final AppTab current;
   final ValueChanged<AppTab> onSelect;
+  final Map<AppTab, GlobalKey> keys;
 
-  const _IosTabBar({required this.current, required this.onSelect});
+  const _AppTabBar({
+    required this.current,
+    required this.onSelect,
+    required this.keys,
+  });
 
   static const _items = {
-    AppTab.home: (CupertinoIcons.house, CupertinoIcons.house_fill, 'Início'),
-    AppTab.map: (CupertinoIcons.map, CupertinoIcons.map_fill, 'Mapa'),
+    AppTab.home: (Icons.home_outlined, Icons.home_rounded, 'Início'),
+    AppTab.map: (Icons.map_outlined, Icons.map_rounded, 'Mapa'),
     AppTab.stops: (
-      CupertinoIcons.placemark,
-      CupertinoIcons.placemark_fill,
+      Icons.location_on_outlined,
+      Icons.location_on_rounded,
       'Pontos',
     ),
-    AppTab.pass: (
-      CupertinoIcons.creditcard,
-      CupertinoIcons.creditcard_fill,
-      'Passe',
-    ),
+    AppTab.pass: (Icons.credit_card_outlined, Icons.credit_card_rounded, 'Passe'),
     AppTab.favorites: (
-      CupertinoIcons.star,
-      CupertinoIcons.star_fill,
+      Icons.star_outline_rounded,
+      Icons.star_rounded,
       'Favoritos',
     ),
   };
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final p = AppPalette.of(context);
     final bottom = MediaQuery.of(context).padding.bottom;
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: Container(
-          padding: EdgeInsets.only(bottom: bottom),
-          decoration: BoxDecoration(
-            color: ios.sheet,
-            border: Border(top: BorderSide(color: ios.separator, width: 0.5)),
-          ),
-          child: SizedBox(
-            height: 54,
-            child: Row(
-              children: [
-                for (final e in _items.entries)
-                  Expanded(
-                    child: GestureDetector(
-                      key: ValueKey('tab-${e.key.name}'),
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => onSelect(e.key),
-                      child: Semantics(
-                        button: true,
-                        selected: e.key == current,
-                        label: e.value.$3,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              e.key == current ? e.value.$2 : e.value.$1,
-                              size: 25,
+    return Container(
+      padding: EdgeInsets.only(bottom: bottom),
+      decoration: BoxDecoration(
+        color: p.ink,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 18)],
+      ),
+      child: SizedBox(
+        height: 68,
+        child: Row(
+          children: [
+            for (final e in _items.entries)
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: e.key == current,
+                  label: e.value.$3,
+                  child: GestureDetector(
+                    key: ValueKey('tab-${e.key.name}'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onSelect(e.key),
+                    child: Center(
+                      child: Column(
+                        key: keys[e.key],
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOutCubic,
+                            width: e.key == current ? 58 : 40,
+                            height: 32,
+                            decoration: BoxDecoration(
                               color: e.key == current
-                                  ? ios.tint
-                                  : ios.secondaryLabel,
+                                  ? p.accent
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              e.value.$3,
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w500,
-                                color: e.key == current
-                                    ? ios.tint
-                                    : ios.secondaryLabel,
-                              ),
+                            child: Icon(
+                              e.key == current ? e.value.$2 : e.value.$1,
+                              size: 24,
+                              color: e.key == current
+                                  ? p.onAccent
+                                  : const Color(0xFFA1A1AA),
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            e.value.$3,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: e.key == current
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              color: e.key == current
+                                  ? Colors.white
+                                  : const Color(0xFFA1A1AA),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
+                ),
+              ),
+          ],
         ),
       ),
     );

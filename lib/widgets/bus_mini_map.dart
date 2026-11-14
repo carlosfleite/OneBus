@@ -51,7 +51,7 @@ class _BusMiniMapState extends State<BusMiniMap>
 
   @override
   Widget build(BuildContext context) {
-    final ios = IosColors.of(context);
+    final ios = AppPalette.of(context);
     final bus = _bus;
     final line = MockData.line(bus.lineId);
     final dark = Theme.of(context).brightness == Brightness.dark;
