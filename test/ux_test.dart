@@ -123,6 +123,9 @@ void main() {
     await tester.tap(find.text('Próximo'));
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('2/5'), findsOneWidget);
+    // The button labels must stay on one line.
+    expect(tester.getSize(find.text('Anterior')).height, lessThan(30));
+    expect(tester.getSize(find.text('Próximo')).height, lessThan(30));
     await tester.tap(find.text('Anterior'));
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('1/5'), findsOneWidget);

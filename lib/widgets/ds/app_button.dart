@@ -15,6 +15,9 @@ class AppButton extends StatelessWidget {
   /// Secondary button drawn on a black surface (white text and outline).
   final bool onDark;
 
+  /// Less horizontal padding, for narrow spaces (side-by-side buttons).
+  final bool compact;
+
   const AppButton({
     super.key,
     required this.label,
@@ -24,6 +27,7 @@ class AppButton extends StatelessWidget {
     this.secondary = false,
     this.destructive = false,
     this.onDark = false,
+    this.compact = false,
   });
 
   @override
@@ -49,7 +53,12 @@ class AppButton extends StatelessWidget {
                   Icon(icon, size: 20),
                   const SizedBox(width: 8),
                 ],
-                Flexible(child: Text(label, textAlign: TextAlign.center)),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(label, maxLines: 1, softWrap: false),
+                  ),
+                ),
               ],
             ),
     );
@@ -60,6 +69,7 @@ class AppButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: fg,
           disabledForegroundColor: loading ? fg : null,
+          padding: compact ? const EdgeInsets.symmetric(horizontal: 8) : null,
           side: onDark ? const BorderSide(color: Colors.white38, width: 1.5) : null,
         ),
         child: child,
@@ -75,6 +85,7 @@ class AppButton extends StatelessWidget {
             ? (destructive ? AppColors.red : p.accent)
             : null,
         disabledForegroundColor: loading ? fg : null,
+        padding: compact ? const EdgeInsets.symmetric(horizontal: 8) : null,
       ),
       child: child,
     );

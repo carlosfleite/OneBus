@@ -247,17 +247,19 @@ class _TourCard extends StatelessWidget {
                 children: [
                   if (onPrev != null) ...[
                     Expanded(
+                      flex: 2,
                       child: AppButton(
                         label: 'Anterior',
                         secondary: true,
                         onDark: true,
+                        compact: true,
                         onPressed: onPrev,
                       ),
                     ),
                     const SizedBox(width: 10),
                   ],
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: AppButton(
                       label: last ? 'Começar a usar' : 'Próximo',
                       onPressed: onNext,

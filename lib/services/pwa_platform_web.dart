@@ -38,23 +38,36 @@ bool get isStandalone {
 }
 
 /// Safe-area insets (notch, Dynamic Island, home bar) measured by the page.
-/// Flutter web doesn't always forward them as `MediaQuery.padding` on iOS.
+/// Flutter web doesn't always forward them as `MediaQuery.padding` on iOS,
+/// so they are read live from a hidden probe styled with
+/// `env(safe-area-inset-*)` (see index.html).
 ({double top, double bottom, double left, double right}) get webSafeInsets {
+  const none = (top: 0.0, bottom: 0.0, left: 0.0, right: 0.0);
   try {
-    final raw = (web.window as JSObject).getProperty<JSAny?>(
-      '__onebusInsets'.toJS,
+    final probe = web.document.getElementById('safe-probe');
+    if (probe == null) return none;
+    final style = web.window.getComputedStyle(probe);
+    double px(String v) => double.tryParse(v.replaceAll('px', '').trim()) ?? 0;
+    var insets = (
+      top: px(style.paddingTop),
+      bottom: px(style.paddingBottom),
+      left: px(style.paddingLeft),
+      right: px(style.paddingRight),
     );
-    if (raw == null || !raw.isA<JSObject>()) {
-      return (top: 0, bottom: 0, left: 0, right: 0);
+    // Installed on iOS the translucent status bar always covers the top of
+    // the page. If the browser reported nothing, keep content below it
+    // anyway (47 is the usual notch height; smaller phones just get a
+    // little extra space).
+    if (insets.top == 0 && isIosSafariBrowser && isStandalone) {
+      insets = (
+        top: 47.0,
+        bottom: insets.bottom,
+        left: insets.left,
+        right: insets.right,
+      );
     }
-    final o = raw as JSObject;
-    double v(String k) {
-      final n = o.getProperty<JSAny?>(k.toJS);
-      return n.isA<JSNumber>() ? (n as JSNumber).toDartDouble : 0;
-    }
-
-    return (top: v('top'), bottom: v('bottom'), left: v('left'), right: v('right'));
+    return insets;
   } catch (_) {
-    return (top: 0, bottom: 0, left: 0, right: 0);
+    return none;
   }
 }

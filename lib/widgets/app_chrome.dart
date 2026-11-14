@@ -13,7 +13,7 @@ import 'onebus_logo.dart';
 ///    phone-sized column;
 ///  * shows a slim "offline" strip when the connection drops;
 ///  * on Safari for iPhone, a hint on how to install the PWA.
-class AppChrome extends StatelessWidget {
+class AppChrome extends StatefulWidget {
   final Widget child;
 
   /// Widest the app column gets on a large screen.
@@ -22,12 +22,49 @@ class AppChrome extends StatelessWidget {
   const AppChrome({super.key, required this.child});
 
   @override
+  State<AppChrome> createState() => _AppChromeState();
+}
+
+class _AppChromeState extends State<AppChrome> with WidgetsBindingObserver {
+  Timer? _timer;
+  int _ticks = 0;
+
+  Widget get child => widget.child;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // On iOS the safe-area values can arrive a moment after the first
+    // frame: read them again for a few seconds.
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (t) {
+      if (!mounted || ++_ticks > 12) {
+        t.cancel();
+        return;
+      }
+      setState(() {});
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, c) {
         final wide = c.maxWidth > 560;
         final mq = MediaQuery.of(context);
-        final width = wide ? maxAppWidth : c.maxWidth;
+        final width = wide ? AppChrome.maxAppWidth : c.maxWidth;
         // iOS PWA: use the safe-area insets measured by the page when
         // Flutter didn't report any (notch, Dynamic Island, home bar).
         final inset = webSafeInsets;
