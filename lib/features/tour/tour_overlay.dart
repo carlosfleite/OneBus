@@ -86,47 +86,48 @@ class _TourOverlayState extends State<TourOverlay> {
 
     return LayoutBuilder(
       builder: (context, c) => Semantics(
-      scopesRoute: true,
-      explicitChildNodes: true,
-      label: 'Tour do aplicativo',
-      child: Stack(
-        children: [
-          // Dim layer with a hole; absorbs taps so the app below is inert.
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {},
-              child: TweenAnimationBuilder<Rect?>(
-                tween: RectTween(
-                  begin: spot ?? Rect.zero,
-                  end: spot ?? Rect.zero,
+        scopesRoute: true,
+        explicitChildNodes: true,
+        label: 'Tour do aplicativo',
+        child: Stack(
+          children: [
+            // Dim layer with a hole; absorbs taps so the app below is inert.
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {},
+                child: TweenAnimationBuilder<Rect?>(
+                  tween: RectTween(
+                    begin: spot ?? Rect.zero,
+                    end: spot ?? Rect.zero,
+                  ),
+                  duration: const Duration(milliseconds: 300),
+                  builder: (context, r, _) => CustomPaint(
+                    painter: _SpotlightPainter(spot == null ? null : r),
+                  ),
                 ),
-                duration: const Duration(milliseconds: 300),
-                builder: (context, r, _) =>
-                    CustomPaint(painter: _SpotlightPainter(spot == null ? null : r)),
               ),
             ),
-          ),
-          if (spot != null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: c.maxHeight - spot.top + 18,
-              child: _TourCard(
-                step: step,
-                index: i,
-                total: widget.steps.length,
-                last: last,
-                arrowX: spot.center.dx - 16,
-                onSkip: _tour.finish,
-                onPrev: i > 0 ? () => _tour.goTo(i - 1) : null,
-                onNext: last ? _tour.finish : () => _tour.goTo(i + 1),
-                p: p,
-                text: text,
+            if (spot != null)
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: c.maxHeight - spot.top + 18,
+                child: _TourCard(
+                  step: step,
+                  index: i,
+                  total: widget.steps.length,
+                  last: last,
+                  arrowX: spot.center.dx - 16,
+                  onSkip: _tour.finish,
+                  onPrev: i > 0 ? () => _tour.goTo(i - 1) : null,
+                  onNext: last ? _tour.finish : () => _tour.goTo(i + 1),
+                  p: p,
+                  text: text,
+                ),
               ),
-            ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -185,11 +186,7 @@ class _TourCard extends StatelessWidget {
                       color: AppColors.brandYellow,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      step.icon,
-                      color: AppColors.brandInk,
-                      size: 22,
-                    ),
+                    child: Icon(step.icon, color: AppColors.brandInk, size: 22),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -274,9 +271,7 @@ class _TourCard extends StatelessWidget {
         Align(
           alignment: Alignment.topLeft,
           child: Padding(
-            padding: EdgeInsets.only(
-              left: (arrowX - 10).clamp(12.0, 4000.0),
-            ),
+            padding: EdgeInsets.only(left: (arrowX - 10).clamp(12.0, 4000.0)),
             child: CustomPaint(
               size: const Size(20, 10),
               painter: _ArrowPainter(),

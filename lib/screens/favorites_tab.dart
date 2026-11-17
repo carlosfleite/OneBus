@@ -81,10 +81,7 @@ class FavoritesTab extends StatelessWidget {
                   ),
                 _PermissionRow(service: notifications),
                 IosRow(
-                  leading: const IconTile(
-                    Icons.send_rounded,
-                    AppColors.blue,
-                  ),
+                  leading: const IconTile(Icons.send_rounded, AppColors.blue),
                   title: 'Enviar notificação de teste',
                   titleColor: ios.tint,
                   onTap: () => AlertsCenter.instance.show(
@@ -150,7 +147,10 @@ class FavoritesTab extends StatelessWidget {
               children: [
                 for (final stopId in favs.stops)
                   IosRow(
-                    leading: const IconTile(Icons.directions_bus_rounded, AppColors.gray),
+                    leading: const IconTile(
+                      Icons.directions_bus_rounded,
+                      AppColors.gray,
+                    ),
                     title: MockData.stop(stopId).name,
                     subtitle:
                         '${distanceTo(stopId).distanceLabel} · linhas '
@@ -205,7 +205,10 @@ class _PermissionRow extends StatelessWidget {
       ),
     };
     return IosRow(
-      leading: const IconTile(Icons.notifications_active_rounded, AppColors.orange),
+      leading: const IconTile(
+        Icons.notifications_active_rounded,
+        AppColors.orange,
+      ),
       title: 'Notificações do sistema',
       subtitle: subtitle,
       trailing: canAsk

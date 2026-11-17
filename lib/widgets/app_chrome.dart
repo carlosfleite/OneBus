@@ -130,9 +130,9 @@ class _DesktopSide extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Tudo sobre ônibus em um lugar só.',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.brandYellow,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: AppColors.brandYellow),
           ),
           const SizedBox(height: 16),
           Text(
@@ -187,7 +187,12 @@ class _AppColumn extends StatelessWidget {
               ],
             ),
           ),
-          const Positioned(left: 12, right: 12, bottom: 0, child: _InstallHint()),
+          const Positioned(
+            left: 12,
+            right: 12,
+            bottom: 0,
+            child: _InstallHint(),
+          ),
         ],
       ),
     );
@@ -267,7 +272,8 @@ class _InstallHintState extends State<_InstallHint> {
   Future<void> _maybeShow() async {
     var dismissed = false;
     try {
-      dismissed = (await SharedPreferences.getInstance()).getBool(_key) ?? false;
+      dismissed =
+          (await SharedPreferences.getInstance()).getBool(_key) ?? false;
     } catch (_) {}
     if (dismissed || !mounted) return;
     // Wait a little so it doesn't compete with the opening animation.

@@ -152,37 +152,38 @@ class _StopsTabState extends State<StopsTab> {
                 onAction: FeedService.instance.refresh,
               )
             else ...[
-            if (nearestShown.isNotEmpty) ...[
-              const SectionHeader('Mais próximo de você'),
-              InsetGroup(children: [row(nearestShown.first)]),
-            ],
-            SectionHeader(
-              _line == null
-                  ? 'Todos os pontos'
-                  : 'Pontos da linha ${MockData.line(_line!).number}',
-            ),
-            InsetGroup(
-              separatorIndent: 58,
-              footer:
-                  '${shown.length} de ${all.length} pontos · distâncias a partir da sua localização. '
-                  'Toque para ver no mapa; estrela para favoritar.',
-              children: [
-                if (others.isEmpty && nearestShown.isEmpty)
-                  EmptyState(
-                    icon: Icons.search_off_rounded,
-                    title: 'Nenhum ponto encontrado',
-                    message: 'Tente outro nome de rua ou bairro, ou remova '
-                        'os filtros.',
-                    actionLabel: 'Limpar busca e filtros',
-                    onAction: () => setState(() {
-                      _search.clear();
-                      _line = null;
-                      _onlyAccessible = false;
-                    }),
-                  ),
-                for (final n in others) row(n),
+              if (nearestShown.isNotEmpty) ...[
+                const SectionHeader('Mais próximo de você'),
+                InsetGroup(children: [row(nearestShown.first)]),
               ],
-            ),
+              SectionHeader(
+                _line == null
+                    ? 'Todos os pontos'
+                    : 'Pontos da linha ${MockData.line(_line!).number}',
+              ),
+              InsetGroup(
+                separatorIndent: 58,
+                footer:
+                    '${shown.length} de ${all.length} pontos · distâncias a partir da sua localização. '
+                    'Toque para ver no mapa; estrela para favoritar.',
+                children: [
+                  if (others.isEmpty && nearestShown.isEmpty)
+                    EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: 'Nenhum ponto encontrado',
+                      message:
+                          'Tente outro nome de rua ou bairro, ou remova '
+                          'os filtros.',
+                      actionLabel: 'Limpar busca e filtros',
+                      onAction: () => setState(() {
+                        _search.clear();
+                        _line = null;
+                        _onlyAccessible = false;
+                      }),
+                    ),
+                  for (final n in others) row(n),
+                ],
+              ),
             ],
           ],
         );

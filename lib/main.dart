@@ -57,8 +57,7 @@ class _OneBusAppState extends State<OneBusApp> {
 
   /// The user opened the recovery link while the app was already running.
   void _onRecovery() {
-    if (!AuthStore.instance.recoveryPending.value ||
-        !SplashScreen.finished) {
+    if (!AuthStore.instance.recoveryPending.value || !SplashScreen.finished) {
       return;
     }
     _navigatorKey.currentState?.pushAndRemoveUntil(

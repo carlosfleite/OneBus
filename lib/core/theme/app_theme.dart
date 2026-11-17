@@ -66,7 +66,11 @@ class AppTheme {
       splashFactory: InkRipple.splashFactory,
       splashColor: p.accent.withValues(alpha: 0.18),
       highlightColor: p.fill,
-      dividerTheme: DividerThemeData(color: p.separator, thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(
+        color: p.separator,
+        thickness: 1,
+        space: 1,
+      ),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: p.accent),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: p.groupedBackground,

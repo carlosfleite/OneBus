@@ -100,13 +100,16 @@ void main() {
   });
 
   group('without Supabase configured', () {
-    test('uses the local account and says recovery needs an online one', () async {
-      expect(AuthStore.instance.usesBackend, isFalse);
-      expect(
-        await AuthStore.instance.sendPasswordReset('a@b.com'),
-        AuthStore.recoveryUnavailable,
-      );
-    });
+    test(
+      'uses the local account and says recovery needs an online one',
+      () async {
+        expect(AuthStore.instance.usesBackend, isFalse);
+        expect(
+          await AuthStore.instance.sendPasswordReset('a@b.com'),
+          AuthStore.recoveryUnavailable,
+        );
+      },
+    );
   });
 
   testWidgets('first access runs the guided tour; Pular ends it for good', (

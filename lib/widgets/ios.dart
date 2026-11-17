@@ -260,9 +260,7 @@ class EtaLabel extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          e.live
-              ? Icons.sensors_rounded
-              : Icons.schedule_rounded,
+          e.live ? Icons.sensors_rounded : Icons.schedule_rounded,
           size: fontSize * 0.75,
           color: color,
         ),

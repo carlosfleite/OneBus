@@ -175,7 +175,9 @@ class PasswordRequirements extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     height: 5,
-                    margin: EdgeInsets.only(right: i == checks.length - 1 ? 0 : 4),
+                    margin: EdgeInsets.only(
+                      right: i == checks.length - 1 ? 0 : 4,
+                    ),
                     decoration: BoxDecoration(
                       color: i < score ? color : p.fill,
                       borderRadius: BorderRadius.circular(3),

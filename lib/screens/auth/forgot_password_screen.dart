@@ -56,7 +56,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     return AuthLayout(
       title: 'Recuperar senha',
-      subtitle: 'Informe o e-mail da sua conta e enviaremos um link para '
+      subtitle:
+          'Informe o e-mail da sua conta e enviaremos um link para '
           'criar uma nova senha.',
       onBack: () => Navigator.of(context).pop(),
       children: [

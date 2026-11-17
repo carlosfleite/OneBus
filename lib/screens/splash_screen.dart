@@ -99,7 +99,10 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _word.value,
                     child: Transform.translate(
                       offset: Offset(0, 14 * (1 - _word.value)),
-                      child: const OneBusWordmark(fontSize: 40, color: Colors.white),
+                      child: const OneBusWordmark(
+                        fontSize: 40,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),

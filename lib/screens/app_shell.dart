@@ -207,7 +207,11 @@ class _AppTabBar extends StatelessWidget {
       Icons.location_on_rounded,
       'Pontos',
     ),
-    AppTab.pass: (Icons.credit_card_outlined, Icons.credit_card_rounded, 'Passe'),
+    AppTab.pass: (
+      Icons.credit_card_outlined,
+      Icons.credit_card_rounded,
+      'Passe',
+    ),
     AppTab.favorites: (
       Icons.star_outline_rounded,
       Icons.star_rounded,

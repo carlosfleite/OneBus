@@ -34,91 +34,92 @@ class PassScreen extends StatelessWidget {
         backgroundColor: ios.accent,
         onRefresh: defaultRefresh,
         child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          const LargeTitleBar(title: 'Passe'),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                ListenableBuilder(
-                  listenable: FeedService.instance,
-                  builder: (context, _) => FeedService.instance.loading
-                      ? const AspectRatio(
-                          aspectRatio: 1.586,
-                          child: Skeleton(radius: 20),
-                        )
-                      : const _PassCard(),
-                ),
-                const LowBalanceCard(),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () => _recharge(context),
-                  child: const Text('Recarregar'),
-                ),
-                SectionHeader(
-                  'Pontos de recarga',
-                  trailing: TextButton(
-                    onPressed: () => nav.openOnMap(const RechargeListPage()),
-                    child: const Text('Ver no mapa'),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            const LargeTitleBar(title: 'Passe'),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  ListenableBuilder(
+                    listenable: FeedService.instance,
+                    builder: (context, _) => FeedService.instance.loading
+                        ? const AspectRatio(
+                            aspectRatio: 1.586,
+                            child: Skeleton(radius: 20),
+                          )
+                        : const _PassCard(),
                   ),
-                ),
-                ListenableBuilder(
-                  listenable: FeedService.instance,
-                  builder: (context, _) => FeedService.instance.loading
-                      ? const SkeletonList(count: 3)
-                      : InsetGroup(
-                  separatorIndent: 58,
-                  footer:
-                      'A recarga pelo app tem taxa de serviço de '
-                      '${formatMoney(PassStore.rechargeFee)}. Nos pontos de recarga, '
-                      'consulte o atendente.',
-                  children: [
-                    for (final n in nearby)
-                      RechargeRow(
-                        near: n,
-                        onTap: () => nav.openOnMap(RechargePage(n.point.id)),
-                      ),
-                  ],
-                ),
-                ),
-                const SizedBox(height: 16),
-                const AdBanner(),
-                const SectionHeader('Últimas viagens'),
-                InsetGroup(
-                  separatorIndent: 74,
-                  footer: 'Valores de demonstração.',
-                  children: [
-                    for (final (lineId, time) in const [
-                      ('l214', 'Hoje, 08:12'),
-                      ('l302', 'Ontem, 18:40'),
-                      ('l214', 'Ontem, 07:55'),
-                      ('l108', 'Seg., 12:20'),
-                    ])
-                      IosRow(
-                        leading: SizedBox(
-                          width: 46,
-                          child: LineBadge(MockData.line(lineId)),
+                  const LowBalanceCard(),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: () => _recharge(context),
+                    child: const Text('Recarregar'),
+                  ),
+                  SectionHeader(
+                    'Pontos de recarga',
+                    trailing: TextButton(
+                      onPressed: () => nav.openOnMap(const RechargeListPage()),
+                      child: const Text('Ver no mapa'),
+                    ),
+                  ),
+                  ListenableBuilder(
+                    listenable: FeedService.instance,
+                    builder: (context, _) => FeedService.instance.loading
+                        ? const SkeletonList(count: 3)
+                        : InsetGroup(
+                            separatorIndent: 58,
+                            footer:
+                                'A recarga pelo app tem taxa de serviço de '
+                                '${formatMoney(PassStore.rechargeFee)}. Nos pontos de recarga, '
+                                'consulte o atendente.',
+                            children: [
+                              for (final n in nearby)
+                                RechargeRow(
+                                  near: n,
+                                  onTap: () =>
+                                      nav.openOnMap(RechargePage(n.point.id)),
+                                ),
+                            ],
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  const AdBanner(),
+                  const SectionHeader('Últimas viagens'),
+                  InsetGroup(
+                    separatorIndent: 74,
+                    footer: 'Valores de demonstração.',
+                    children: [
+                      for (final (lineId, time) in const [
+                        ('l214', 'Hoje, 08:12'),
+                        ('l302', 'Ontem, 18:40'),
+                        ('l214', 'Ontem, 07:55'),
+                        ('l108', 'Seg., 12:20'),
+                      ])
+                        IosRow(
+                          leading: SizedBox(
+                            width: 46,
+                            child: LineBadge(MockData.line(lineId)),
+                          ),
+                          title: MockData.line(lineId).name,
+                          subtitle: time,
+                          trailing: Text(
+                            '− R\$ 5,00',
+                            style: TextStyle(color: ios.secondaryLabel),
+                          ),
                         ),
-                        title: MockData.line(lineId).name,
-                        subtitle: time,
-                        trailing: Text(
-                          '− R\$ 5,00',
-                          style: TextStyle(color: ios.secondaryLabel),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: PassStore.instance.chargeFare,
-                  child: const Text('Simular embarque (− R\$ 5,00)'),
-                ),
-              ]),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: PassStore.instance.chargeFare,
+                    child: const Text('Simular embarque (− R\$ 5,00)'),
+                  ),
+                ]),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

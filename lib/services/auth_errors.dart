@@ -7,8 +7,7 @@ class AuthErrors {
   AuthErrors._();
 
   static const generic = 'Algo deu errado. Tente novamente.';
-  static const offline =
-      'Sem conexão. Verifique sua internet e tente de novo.';
+  static const offline = 'Sem conexão. Verifique sua internet e tente de novo.';
 
   static String humanize(Object error) {
     if (error is AuthException) return _fromAuth(error);

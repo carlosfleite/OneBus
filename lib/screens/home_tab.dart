@@ -260,14 +260,14 @@ class _HomeCard extends StatelessWidget {
                 onAction: () => nav.select(AppTab.favorites),
               ),
             if (!FeedService.instance.loading && !FeedService.instance.failed)
-            for (final r in rides) ...[
-              _RideCard(
-                line: r.line,
-                stop: r.stop,
-                notify: favs.notifyArrivals && favs.hasStop(r.stop.id),
-              ),
-              const SizedBox(height: 10),
-            ],
+              for (final r in rides) ...[
+                _RideCard(
+                  line: r.line,
+                  stop: r.stop,
+                  notify: favs.notifyArrivals && favs.hasStop(r.stop.id),
+                ),
+                const SizedBox(height: 10),
+              ],
             if (favs.notifyArrivals && favs.watchedPairs.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -418,7 +418,11 @@ class _RideCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.directions_bus_rounded, size: 13, color: ios.secondaryLabel),
+                Icon(
+                  Icons.directions_bus_rounded,
+                  size: 13,
+                  color: ios.secondaryLabel,
+                ),
                 const SizedBox(width: 5),
                 Expanded(
                   child: Text(

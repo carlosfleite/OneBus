@@ -233,9 +233,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       ? AutofillHints.newPassword
                       : AutofillHints.password,
                 ],
-                action: _creating
-                    ? TextInputAction.next
-                    : TextInputAction.done,
+                action: _creating ? TextInputAction.next : TextInputAction.done,
                 errorText: show && !_creating ? _passwordError : null,
                 onSubmitted: _creating ? null : _submit,
                 onChanged: (_) => setState(() {}),

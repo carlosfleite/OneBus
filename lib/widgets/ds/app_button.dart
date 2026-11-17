@@ -70,7 +70,9 @@ class AppButton extends StatelessWidget {
           foregroundColor: fg,
           disabledForegroundColor: loading ? fg : null,
           padding: compact ? const EdgeInsets.symmetric(horizontal: 8) : null,
-          side: onDark ? const BorderSide(color: Colors.white38, width: 1.5) : null,
+          side: onDark
+              ? const BorderSide(color: Colors.white38, width: 1.5)
+              : null,
         ),
         child: child,
       );

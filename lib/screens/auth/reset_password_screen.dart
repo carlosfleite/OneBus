@@ -64,7 +64,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return AuthLayout(
       title: 'Crie uma nova senha',
-      subtitle: 'Escolha uma senha forte. Você vai usá-la para entrar no '
+      subtitle:
+          'Escolha uma senha forte. Você vai usá-la para entrar no '
           'OneBus.',
       children: [
         if (_error != null) AuthNotice(NoticeKind.error, _error!),

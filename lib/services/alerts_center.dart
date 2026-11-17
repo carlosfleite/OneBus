@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-
 import '../core/theme/app_colors.dart';
 import '../data/mock_data.dart';
 import 'bus_simulator.dart';

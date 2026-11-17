@@ -44,9 +44,7 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
       const SizedBox(height: 12),
       ActionButtons([
         (
-          icon: nav.following
-              ? Icons.near_me_rounded
-              : Icons.near_me_outlined,
+          icon: nav.following ? Icons.near_me_rounded : Icons.near_me_outlined,
           label: nav.following ? 'Seguindo' : 'Seguir',
           primary: nav.following,
           onTap: nav.follow,
@@ -124,10 +122,7 @@ SheetContent buildBusSheet(BuildContext context, SheetNav nav, String busId) {
           child: InsetGroup(
             children: [
               IosRow(
-                leading: const IconTile(
-                  Icons.flag_rounded,
-                  AppColors.blue,
-                ),
+                leading: const IconTile(Icons.flag_rounded, AppColors.blue),
                 title: 'Aviso de descida ativo',
                 subtitle: MockData.stop(alerts.alight!.stopId).name,
                 trailing: TextButton(

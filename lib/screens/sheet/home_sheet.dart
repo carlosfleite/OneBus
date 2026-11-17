@@ -179,7 +179,10 @@ List<Widget> _searchResults(BuildContext context, SheetNav nav, String q) {
         children: [
           for (final stop in stops)
             IosRow(
-              leading: const IconTile(Icons.directions_bus_rounded, AppColors.gray),
+              leading: const IconTile(
+                Icons.directions_bus_rounded,
+                AppColors.gray,
+              ),
               title: stop.name,
               subtitle: stop.address,
               trailing: _StarButton(

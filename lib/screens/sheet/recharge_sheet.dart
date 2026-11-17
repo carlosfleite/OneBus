@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/nearby.dart';
@@ -71,10 +70,7 @@ SheetContent buildRechargeSheet(
       InsetGroup(
         children: [
           IosRow(
-            leading: const IconTile(
-              Icons.location_on_rounded,
-              AppColors.gray,
-            ),
+            leading: const IconTile(Icons.location_on_rounded, AppColors.gray),
             title: 'Endereço',
             subtitle: p.address,
           ),
