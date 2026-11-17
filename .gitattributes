@@ -1,0 +1,20 @@
+# Normaliza as quebras de linha: o Git guarda LF e cada sistema usa a sua.
+* text=auto
+
+*.dart text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+
+# Arquivos binários
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.apk binary

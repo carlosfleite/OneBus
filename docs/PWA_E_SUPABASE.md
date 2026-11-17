@@ -21,6 +21,11 @@ flutter build web --release --no-web-resources-cdn --pwa-strategy=none \
 - Se publicar em um subcaminho (ex.: GitHub Pages), acrescente
   `--base-href /onebus/` e use `SITE_URL=https://usuario.github.io/onebus/`.
 
+> Dica: em vez de repetir as três opções `--dart-define`, copie
+> `dart_defines.example.json` para `dart_defines.json` (fora do Git), preencha e
+> use `--dart-define-from-file=dart_defines.json`.
+> Use a chave **publicável** (`sb_publishable_…`), nunca a `service_role`.
+
 ## 2. Hospedagem
 
 - Precisa de **HTTPS** (exigência de PWA e do Safari).
@@ -29,6 +34,21 @@ flutter build web --release --no-web-resources-cdn --pwa-strategy=none \
   abertura, mas isso evita surpresas em CDNs agressivas.
 - O app usa URLs sem `#`; basta servir `index.html` na raiz (não há rotas
   profundas).
+
+### Publicar na Vercel (pelo terminal)
+
+A Vercel não compila Flutter, então se publica a pasta já pronta:
+
+```bash
+npm install -g vercel
+vercel login
+flutter build web --release --no-web-resources-cdn --pwa-strategy=none --dart-define-from-file=dart_defines.json
+cd build/web
+vercel --prod        # na primeira vez: criar projeto novo e responder N às perguntas de Git
+```
+
+O `web/vercel.json` vai junto no build e configura o cache. O endereço final
+(ex.: `https://onebus-pi.vercel.app`) deve ser o `SITE_URL`.
 
 ## 3. Supabase (painel do projeto)
 

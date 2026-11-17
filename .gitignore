@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Instaladores gerados (o APK é distribuído fora do Git)
+/dist/
+
+# Configuração local com as chaves (use dart_defines.example.json como modelo)
+dart_defines.json
+.env
