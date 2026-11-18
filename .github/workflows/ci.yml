@@ -51,7 +51,7 @@ jobs:
         run: flutter build web --release --no-web-resources-cdn --pwa-strategy=none
 
       - name: Guarda o resultado
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: onebus-web
           path: build/web
